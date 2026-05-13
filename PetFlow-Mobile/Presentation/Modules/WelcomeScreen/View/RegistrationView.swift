@@ -11,6 +11,8 @@ struct RegistrationView: View {
     @StateObject private var viewModel = RegistrationViewModel()
     @Environment(\.dismiss) var dismiss
     
+    @State private var navigateToAddPet = false
+    
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -24,7 +26,7 @@ struct RegistrationView: View {
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(Color(hex: "#4A37A7"))
                 Spacer()
-            
+                
                 Color.clear.frame(width: 20, height: 20)
             }
             .padding(.horizontal)
@@ -69,6 +71,7 @@ struct RegistrationView: View {
                     VStack(spacing: 16) {
                         PrimaryButton(title: RegistrationViewStrings.finishRegistration, isSecondary: false) {
                             viewModel.finishRegistration()
+                            navigateToAddPet = true
                         }
                         
                         Text(RegistrationViewStrings.termsFullAgreement)
@@ -80,6 +83,9 @@ struct RegistrationView: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
+            }
+            .navigationDestination(isPresented: $navigateToAddPet) {
+                AddPetView()
             }
         }
         .navigationBarHidden(true)

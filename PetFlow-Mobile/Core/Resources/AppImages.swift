@@ -17,3 +17,17 @@ struct RegistrationViewImages{
     static let avatarPlaceholder = "AvatarCat"
 }
 
+struct AddPetViewImages {
+    static let cameraIcon = "camera.fill"
+    static let profileIcon = "person.circle.fill"
+    static let petPlaceholder = "PetPhotoPlaceholder"
+}
+
+struct ClinicCatalogViewImages {
+    static let tabCatalogIcon = "bag.fill"
+    static let tabPetsIcon = "pawprint.fill"
+    static let tabBookingsIcon = "calendar"
+    static let tabProfileIcon = "person.fill"
+    static let searchIcon = "magnifyingglass"
+    static let filterIcon = "line.3.horizontal.decrease"
+}

@@ -28,3 +28,23 @@ struct RegistrationViewStrings {
     static let termsFullAgreement = "Нажимая кнопку, вы соглашаетесь с условиями использования и политикой конфиденциальности."
 }
 
+struct AddPetViewStrings {
+    static let addPetTitle = "Добавьте вашего питомца"
+    static let addPetSubtitle = "Это поможет нам подобрать лучшие предложения для здоровья вашего друга"
+    static let petNameLabel = "Кличка питомца"
+    static let petNamePlaceholder = "Например, Арчи"
+    static let petTypeLabel = "Вид животного"
+    static let petTypePlaceholder = "Выберите вид"
+    static let continueButton = "Продолжить"
+    static let addLater = "Добавить позже"
+}
+
+struct ClinicCatalogViewString {
+    static let tabCatalog = "Catalog"
+    static let tabMyPets = "My Pets"
+    static let tabBookings = "Bookings"
+    static let tabProfile = "Profile"
+    static let searchPlaceholder = "Поиск клиник"
+    static let filterAll = "Все"
+}
+
