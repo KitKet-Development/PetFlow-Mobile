@@ -21,11 +21,11 @@ struct MainTabView: View {
                 case .catalog:
                     ClinicCatalogView()
                 case .pets:
-                    Text("Экран питомцев")
+                    PetDetailView()
                 case .bookings:
-                    Text("Экран записей")
+                    BookingView()
                 case .profile:
-                    Text("Экран профиля")
+                    ProfileView()
                 }
             }
             

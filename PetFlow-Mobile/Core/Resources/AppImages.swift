@@ -31,3 +31,22 @@ struct ClinicCatalogViewImages {
     static let searchIcon = "magnifyingglass"
     static let filterIcon = "line.3.horizontal.decrease"
 }
+
+struct ProfileViewImages {
+    static let menuIcon = "line.3.horizontal"
+    static let plusIcon = "plus.circle"
+    static let vaccinationIcon = "cross.case.fill"
+    static let groomingIcon = "scissors"
+    static let editIcon = "person.badge.plus"
+    static let bellIcon = "bell"
+    static let logoutIcon = "rectangle.portrait.and.arrow.right"
+    static let userPhoto = "UserAvatarLarge"
+}
+
+struct PetDetailViewImages {
+    static let diseaseIcon = "doc.plaintext.fill"
+    static let vaccineIcon = "syringe.fill"
+    static let historyIcon = "clock.arrow.circlepath"
+    static let checkmarkIcon = "checkmark.circle.fill"
+    static let paperclipIcon = "paperclip"
+}

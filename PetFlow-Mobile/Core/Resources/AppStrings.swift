@@ -48,3 +48,36 @@ struct ClinicCatalogViewString {
     static let filterAll = "Все"
 }
 
+struct ProfileViewString {
+    static let myPets = "Мои питомцы"
+    static let bookingHistory = "История записей"
+    static let editProfile = "Редактировать профиль"
+    static let notifications = "Уведомления"
+    static let logout = "Выйти"
+    static let statusSoon = "Скоро"
+    static let statusCompleted = "Завершено"
+    static let profileTitle = "Профиль"
+    static let phoneNumber = "Номер телефона"
+    static let emailAddress = "Адрес электронной почты"
+    static let saveChanges = "Сохранить изменения"
+    static let deleteAccount = "Удалить аккаунт"
+    static let placeholderPhone = "+7 (888) 367-34-56"
+}
+
+struct PetDetailViewString {
+    static let chronicDiseases = "Хронические заболевания"
+    static let vaccinations = "Вакцинации"
+    static let healthHistory = "История здоровья"
+    static let showAllVaccinations = "Показать все вакцинации"
+    static let totalVaccinations = "Всего: 4"
+}
+
+struct BookingViewString {
+    static let selectDateTitle = "Выберите дату и время"
+    static let selectPetTitle = "Выберите питомца"
+    static let commentTitle = "Комментарий к записи"
+    static let commentPlaceholder = "Кратко опишите причину обращения"
+    static let confirmBooking = "Подтвердить запись"
+    static let addPetAction = "Добавить питомца"
+    static let bookingTerms = "Нажимая кнопку, вы соглашаетесь с условиями конфиденциальности клиники"
+}
