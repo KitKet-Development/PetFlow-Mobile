@@ -17,13 +17,19 @@ struct HealthRecord: Identifiable {
     let fileName: String?
 }
 
-class PetDetailViewModel: ObservableObject {
-    @Published var petName = "Барни"
-    @Published var breed = "Золотистый ретривер"
-    @Published var age = "3 месяца"
-    
-    @Published var healthRecords = [
-        HealthRecord(date: "14 ЯНВ 2024", title: "Плановый осмотр", description: "Состояние отличное. Рекомендовано увеличение физической нагрузки.", doctor: "Д-р Васильева", fileName: "check-up_jan24.pdf"),
-        HealthRecord(date: "20 НОЯ 2023", title: "Чистка зубов", description: "Удален зубной камень, десна в норме.", doctor: nil, fileName: nil)
+@MainActor
+final class PetDetailViewModel: ObservableObject {
+
+    @Published var pet: LocalPet?
+    @Published var healthRecords: [HealthRecord] = [
+        // Example data to prevent empty view (optional, adjust as needed)
+        HealthRecord(date: "01 Янв 2024", title: "Осмотр", description: "Плановый осмотр, все хорошо.", doctor: "Иванова И.А.", fileName: "osmotrovka.pdf"),
+        HealthRecord(date: "10 Фев 2024", title: "Вакцинация", description: "Прививка от бешенства.", doctor: nil, fileName: nil)
     ]
+
+    private let session = AppSession.shared
+
+    func loadPet() {
+        pet = session.pets.first
+    }
 }

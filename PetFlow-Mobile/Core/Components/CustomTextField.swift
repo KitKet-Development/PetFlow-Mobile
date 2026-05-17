@@ -8,26 +8,63 @@
 import SwiftUI
 
 struct CustomTextField: View {
+    
     let label: String
     let placeholder: String
+    
     @Binding var text: String
+    
     var isSecure: Bool = false
     
+    var keyboardType: UIKeyboardType = .default
+    
+    var hasError: Bool = false
+    
+    @State private var isPasswordVisible = false
+    
     var body: some View {
+        
         VStack(alignment: .leading, spacing: 8) {
+            
             Text(label)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.black)
             
-            Group {
+            HStack {
+                
+                Group {
+                    
+                    if isSecure {
+                        HStack {
+                            Group {
+                                if isPasswordVisible {
+                                    TextField(placeholder, text: $text)
+                                } else {
+                                    SecureField(placeholder, text: $text)
+                                }
+                            }
+                            
+                            Button {
+                                isPasswordVisible.toggle()
+                            } label: {
+                                Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    } else {
+                        TextField(placeholder, text: $text)
+                            .keyboardType(keyboardType)
+                    }
+                }
+                
                 if isSecure {
-                    HStack {
-                        SecureField(placeholder, text: $text)
-                        Image(systemName: RegistrationViewImages.eyeIcon)
+                    
+                    Button {
+                        isPasswordVisible.toggle()
+                    } label: {
+                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
                             .foregroundColor(.gray)
                     }
-                } else {
-                    TextField(placeholder, text: $text)
                 }
             }
             .padding()
@@ -36,7 +73,7 @@ struct CustomTextField: View {
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(hex: "#D1D1D1"), lineWidth: 1)
+                    .stroke(hasError ? Color.red : Color(hex: "#D1D1D1"), lineWidth: 1)
             )
         }
     }

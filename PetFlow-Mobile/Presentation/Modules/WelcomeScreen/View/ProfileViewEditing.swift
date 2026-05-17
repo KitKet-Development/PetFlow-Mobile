@@ -6,10 +6,14 @@
 //
 import SwiftUI
 import Combine
+import PhotosUI
 
 struct ProfileViewEditing: View {
     @StateObject private var viewModel = ProfileViewModel()
     @Environment(\.dismiss) var dismiss
+    
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var avatarImage: Image?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -41,9 +45,12 @@ struct ProfileViewEditing: View {
                                     .fill(Color.black.opacity(0.4))
                             )
                         
-                        Image(systemName: AddPetViewImages.cameraIcon)
-                            .font(.system(size: 30))
-                            .foregroundColor(.white)
+                        PhotosPicker(selection: $selectedItem, matching: .images) {
+                            Circle()
+                                .fill(Color(hex: "#4A37A7"))
+                                .frame(width: 44, height: 44)
+                                .overlay(Image(systemName: AddPetViewImages.cameraIcon).foregroundColor(.white))
+                        }
                     }
                     .padding(.top, 20)
                     
@@ -57,7 +64,7 @@ struct ProfileViewEditing: View {
                     
                     VStack(spacing: 12) {
                         PrimaryButton(title: ProfileViewString.saveChanges, isSecondary: false) {
-                            viewModel.saveChanges()
+                            //viewModel.saveChanges()
                             dismiss()
                         }
                         

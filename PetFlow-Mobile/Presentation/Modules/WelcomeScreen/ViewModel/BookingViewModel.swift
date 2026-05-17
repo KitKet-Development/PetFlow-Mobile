@@ -8,24 +8,112 @@
 import Foundation
 import Combine
 
-class BookingViewModel: ObservableObject {
+@MainActor
+final class BookingViewModel: ObservableObject {
+
     @Published var selectedDate = "12"
     @Published var selectedTime = "10:30"
     @Published var selectedPetId: UUID?
     @Published var comment = ""
-    
-    let days = [
-        ("ПН", "11"), ("ВТ", "12"), ("СР", "13"), ("ЧТ", "14"), ("ПТ", "15")
+
+    @Published var pets: [PetMock] = []
+
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    var days: [(String, String)] {
+
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+
+        return (0..<5).compactMap { index in
+
+            guard let date = calendar.date(byAdding: .day, value: index, to: Date()) else {
+                return nil
+            }
+
+            formatter.dateFormat = "EE"
+            let day = formatter.string(from: date).uppercased()
+
+            formatter.dateFormat = "dd"
+            let number = formatter.string(from: date)
+
+            return (day, number)
+        }
+    }
+
+    let timeSlots = [
+        "09:00",
+        "10:30",
+        "11:00",
+        "13:30",
+        "15:00",
+        "16:30"
     ]
-    
-    let timeSlots = ["09:00", "10:30", "11:00", "13:30", "15:00", "16:30"]
-    
-    @Published var pets = [
-        PetMock(name: "Барон", breed: "Золотистый ретривер", imageName: "dog_thumb"),
-        PetMock(name: "Луна", breed: "Шотландская вислоухая", imageName: "cat_thumb")
-    ]
-    
-    func confirmBooking() {
-        print("Запись подтверждена на \(selectedDate) в \(selectedTime) для питомца с ID \(String(describing: selectedPetId))")
+
+    private let bookingUseCase: CreateBookingUseCase
+    private let getPetsUseCase: GetPetsUseCase
+
+    init(
+        bookingUseCase: CreateBookingUseCase = CreateBookingUseCase(
+            repository: AppContainer.shared.bookingRepository
+        ),
+        getPetsUseCase: GetPetsUseCase = GetPetsUseCase(
+            repository: AppContainer.shared.petRepository
+        )
+    ) {
+        self.bookingUseCase = bookingUseCase
+        self.getPetsUseCase = getPetsUseCase
+    }
+
+    func loadPets() async {
+
+        do {
+            isLoading = true
+
+            let dto = try await getPetsUseCase.execute()
+
+            pets = dto.map {
+                PetMock(
+                    name: $0.name,
+                    breed: "Unknown",
+                    imageName: "dog_thumb"
+                )
+            }
+
+            isLoading = false
+
+        } catch {
+            isLoading = false
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func confirmBooking(
+        clinicId: Int,
+        petId: Int
+    ) async {
+
+        do {
+            isLoading = true
+
+            let dto = BookingDTO(
+                id: nil,
+                pet: petId,
+                clinic: clinicId,
+                comment: comment,
+                booking_date: selectedDate,
+                booking_time: selectedTime
+            )
+
+            try await bookingUseCase.execute(dto: dto)
+
+            isLoading = false
+
+        } catch {
+            isLoading = false
+            errorMessage = error.localizedDescription
+        }
     }
 }

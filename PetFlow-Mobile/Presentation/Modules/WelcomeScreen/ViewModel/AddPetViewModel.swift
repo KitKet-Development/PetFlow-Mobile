@@ -7,17 +7,38 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
-class AddPetViewModel: ObservableObject {
+@MainActor
+final class AddPetViewModel: ObservableObject {
+
     @Published var petName = ""
     @Published var petType = ""
-    let petTypes = ["Собака", "Кот", "Попугай", "Грызун", "Другое"]
-    
-    func onContinueTap() {
-        print("Сохранение питомца: \(petName), вид: \(petType)")
+
+    @Published var petImage: UIImage?
+
+    let petTypes = [
+        "Собака",
+        "Кот",
+        "Попугай",
+        "Грызун",
+        "Другое"
+    ]
+
+    private let session = AppSession.shared
+
+    func onContinueTap() async {
+
+        let pet = LocalPet(
+            name: petName,
+            type: petType,
+            image: petImage
+        )
+
+        session.pets.append(pet)
     }
-    
+
     func onAddLaterTap() {
-        print("Пропуск шага")
+        print("Skip pet")
     }
 }

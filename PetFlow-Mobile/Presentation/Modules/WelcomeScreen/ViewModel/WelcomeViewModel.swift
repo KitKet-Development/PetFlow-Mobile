@@ -8,16 +8,30 @@
 import Foundation
 import Combine
 
-class WelcomeViewModel: ObservableObject {
-    
-    let objectWillChange = ObservableObjectPublisher()
-    
-    
-    func onRegistrationTap() {
-        print("Переход к регистрации")
+@MainActor
+final class WelcomeViewModel: ObservableObject {
+
+    @Published var isAuthorized = false
+    @Published var isLoading = false
+
+    private let tokenStorage: TokenStorageProtocol
+
+    init(
+        tokenStorage: TokenStorageProtocol = AppContainer.shared.tokenStorage
+    ) {
+        self.tokenStorage = tokenStorage
+        checkAuth()
     }
-    
+
+    func checkAuth() {
+        isAuthorized = tokenStorage.getAccessToken() != nil
+    }
+
+    func onRegistrationTap() {
+        print("Open registration")
+    }
+
     func onLoginTap() {
-        print("Переход ко входу")
+        print("Open login")
     }
 }

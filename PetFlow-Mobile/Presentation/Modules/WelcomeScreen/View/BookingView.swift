@@ -92,7 +92,7 @@ struct BookingView: View {
                     
                     VStack(spacing: 12) {
                         PrimaryButton(title: BookingViewString.confirmBooking, isSecondary: false) {
-                            viewModel.confirmBooking()
+                            
                         }
                         
                         Text(BookingViewString.bookingTerms)

@@ -6,13 +6,18 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct AddPetView: View {
     @StateObject private var viewModel = AddPetViewModel()
+    @StateObject private var storage = LocalStorageService.shared
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var petImage: Image? = nil
+    @State private var petUIImage: UIImage? = nil
     @Environment(\.dismiss) var dismiss
-    
+
     @State private var isRegistrationFinished = false
-    
+
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -32,33 +37,42 @@ struct AddPetView: View {
             }
             .padding(.horizontal)
             .padding(.bottom, 10)
-            
-            
+
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     ZStack(alignment: .bottomTrailing) {
-                        Image(AddPetViewImages.petPlaceholder)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 250)
-                            .frame(maxWidth: .infinity)
-                            .background(Color(hex: "#E8E3FF"))
-                            .cornerRadius(20)
-                            .clipped()
-                        
-                        Button(action: { /* TODO: add action for take photo from phone */ }) {
+                        if let petImage = petImage {
+                            petImage
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 250)
+                                .frame(maxWidth: .infinity)
+                                .cornerRadius(20)
+                                .clipped()
+                        } else {
+                            Image(AddPetViewImages.petPlaceholder)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 250)
+                                .frame(maxWidth: .infinity)
+                                .background(Color(hex: "#E8E3FF"))
+                                .cornerRadius(20)
+                                .clipped()
+                        }
+
+                        PhotosPicker(selection: $selectedItem, matching: .images) {
                             Circle()
                                 .fill(Color(hex: "#4A37A7"))
                                 .frame(width: 44, height: 44)
-                                .overlay(
-                                    Image(systemName: AddPetViewImages.cameraIcon)
-                                        .foregroundColor(.white)
-                                )
+                                .overlay(Image(systemName: AddPetViewImages.cameraIcon).foregroundColor(.white))
                         }
                         .padding(12)
                     }
                     .padding(.top, 20)
-                    
+                    .task(id: selectedItem) {
+                        await loadImage(from: selectedItem)
+                    }
+
                     VStack(spacing: 8) {
                         Text(AddPetViewStrings.addPetTitle)
                             .font(.system(size: 24, weight: .bold))
@@ -68,14 +82,14 @@ struct AddPetView: View {
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
                     }
-                    
+
                     VStack(spacing: 16) {
                         CustomTextField(
                             label: AddPetViewStrings.petNameLabel,
                             placeholder: AddPetViewStrings.petNamePlaceholder,
                             text: $viewModel.petName
                         )
-                        
+
                         DropdownField(
                             label: AddPetViewStrings.petTypeLabel,
                             placeholder: AddPetViewStrings.petTypePlaceholder,
@@ -83,13 +97,17 @@ struct AddPetView: View {
                             options: viewModel.petTypes
                         )
                     }
-                    
+
                     VStack(spacing: 16) {
                         PrimaryButton(title: AddPetViewStrings.continueButton, isSecondary: false) {
-                            viewModel.onContinueTap()
-                            isRegistrationFinished = true
+                            let pet = LocalPet(
+                                name: viewModel.petName,
+                                type: viewModel.petType,
+                                image: petUIImage
+                            )
+                            storage.pets.append(pet)
                         }
-                        
+
                         Button(action: {
                             viewModel.onAddLaterTap()
                             isRegistrationFinished = true
@@ -111,5 +129,15 @@ struct AddPetView: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+    }
+
+    @MainActor
+    private func loadImage(from pickerItem: PhotosPickerItem?) async {
+        guard let data = try? await pickerItem?.loadTransferable(type: Data.self),
+              let uiImage = UIImage(data: data) else {
+            return
+        }
+        petImage = Image(uiImage: uiImage)
+        petUIImage = uiImage
     }
 }

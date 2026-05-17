@@ -25,31 +25,90 @@ struct BookingMock: Identifiable {
     let icon: String
 }
 
-class ProfileViewModel: ObservableObject {
-    @Published var userName = "Иван Иванов"
-    @Published var userEmail = "ivanov.petcare@example.com"
-    
-    @Published var firstName: String = ""
-    @Published var lastName: String = ""
-    @Published var phone: String = ""
-    @Published var email: String = ""
-    @Published var password: String = ""
-    
-    @Published var pets = [
-        PetMock(name: "Барни", breed: "Золотистый ретривер", imageName: "dog_thumb"),
-        PetMock(name: "Луна", breed: "Шотландская", imageName: "cat_thumb")
-    ]
-    
-    @Published var bookings = [
-        BookingMock(type: "Вакцинация", petName: "Барни", date: "15 Октября", time: "10:30", status: "Скоро", icon: ProfileViewImages.vaccinationIcon),
-        BookingMock(type: "Груминг", petName: "Луна", date: "28 Сентября", time: "14:00", status: "Завершено", icon: ProfileViewImages.groomingIcon)
-    ]
+@MainActor
+final class ProfileViewModel: ObservableObject {
 
-    func saveChanges() {
-        print("Saving changes:", firstName, lastName, phone, email, password)
+    @Published var userName = ""
+    @Published var userEmail = ""
+
+    @Published var firstName = ""
+    @Published var lastName = ""
+    @Published var phone = ""
+    @Published var email = ""
+    @Published var password = ""
+
+    @Published var pets: [PetMock] = []
+    @Published var bookings: [BookingMock] = []
+
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    private let getProfileUseCase: GetProfileUseCase
+    private let updateProfileUseCase: UpdateProfileUseCase
+    private let getPetsUseCase: GetPetsUseCase
+
+    init(
+        getProfileUseCase: GetProfileUseCase = GetProfileUseCase(
+            repository: AppContainer.shared.profileRepository
+        ),
+        updateProfileUseCase: UpdateProfileUseCase = UpdateProfileUseCase(
+            repository: AppContainer.shared.profileRepository
+        ),
+        getPetsUseCase: GetPetsUseCase = GetPetsUseCase(
+            repository: AppContainer.shared.petRepository
+        )
+    ) {
+        self.getProfileUseCase = getProfileUseCase
+        self.updateProfileUseCase = updateProfileUseCase
+        self.getPetsUseCase = getPetsUseCase
+    }
+
+    func loadProfile() async {
+
+        do {
+            isLoading = true
+
+            let profile = try await getProfileUseCase.execute()
+
+            firstName = profile.first_name
+            lastName = profile.last_name
+            email = profile.email
+            phone = profile.phone ?? ""
+
+            userName = "\(profile.first_name) \(profile.last_name)"
+            userEmail = profile.email
+
+            isLoading = false
+
+        } catch {
+            isLoading = false
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func saveChanges() async {
+
+        do {
+            isLoading = true
+
+            let dto = UserProfileDTO(
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                phone: phone
+            )
+
+            try await updateProfileUseCase.execute(dto: dto)
+
+            isLoading = false
+
+        } catch {
+            isLoading = false
+            errorMessage = error.localizedDescription
+        }
     }
 
     func deleteAccount() {
-        print("Account deletion initiated")
+        print("DELETE /profile")
     }
 }

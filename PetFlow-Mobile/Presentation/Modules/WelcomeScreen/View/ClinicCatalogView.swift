@@ -9,6 +9,21 @@ import SwiftUI
 
 struct ClinicCatalogView: View {
     @State private var searchText = ""
+    @State private var selectedFilter = "Все"
+    @State private var selectedClinic: Clinic? = nil
+    
+    let allClinics = [
+        Clinic(name: "ЗооЦентр «Пушистики»", address: "ул. Ленина, 45", distance: "1.2 км", rating: "4.9", price: "₽₽", category: "Кошки", description: "Лучшая клиника для ваших котиков с современным оборудованием.", phone: "+7 (999) 123-45-67", workingHours: "09:00 - 21:00", imageName: "clinic_1"),
+        Clinic(name: "Вет-Клиника «Альфа»", address: "пр. Мира, 12", distance: "2.8 км", rating: "4.7", price: "₽₽₽", category: "Собаки", description: "Специализируемся на крупных породах собак и хирургии.", phone: "+7 (999) 888-77-66", workingHours: "Круглосуточно", imageName: "clinic_2")
+    ]
+    
+    var filteredClinics: [Clinic] {
+        allClinics.filter { clinic in
+            let matchCategory = (selectedFilter == "Все" || clinic.category == selectedFilter)
+            let matchSearch = searchText.isEmpty || clinic.name.lowercased().contains(searchText.lowercased())
+            return matchCategory && matchSearch
+        }
+    }
     
     var body: some View {
         VStack(spacing: 16) {
@@ -37,18 +52,31 @@ struct ClinicCatalogView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    FilterChip(title: ClinicCatalogViewString.filterAll, icon: ClinicCatalogViewImages.filterIcon, isSelected: true)
-                    FilterChip(title: "Кошки", isSelected: false)
-                    FilterChip(title: "Собаки", isSelected: false)
-                    FilterChip(title: "Рядом", isSelected: false)
+                    FilterChip(title: "Все", icon: ClinicCatalogViewImages.filterIcon, isSelected: selectedFilter == "Все")
+                        .onTapGesture { selectedFilter = "Все" }
+                    
+                    ForEach(["Кошки", "Собаки", "Рядом"], id: \.self) { cat in
+                        FilterChip(title: cat, isSelected: selectedFilter == cat)
+                            .onTapGesture { selectedFilter = cat }
+                    }
                 }
                 .padding(.horizontal)
             }
             
             ScrollView {
                 VStack(spacing: 20) {
-                    ClinicCard(name: "ЗооЦентр «Пушистики»", address: "ул. Ленина, 45", distance: "1.2 км", rating: "4.9", price: "₽₽")
-                    ClinicCard(name: "Вет-Клиника «Альфа»", address: "пр. Мира, 12", distance: "2.8 км", rating: "4.7", price: "₽₽₽")
+                    ForEach(filteredClinics) { clinic in
+                        ClinicCard(
+                            name: clinic.name,
+                            address: clinic.address,
+                            distance: clinic.distance,
+                            rating: clinic.rating,
+                            price: clinic.price
+                        )
+                        .onTapGesture {
+                            selectedClinic = clinic
+                        }
+                    }
                 }
                 .padding()
             }
@@ -125,3 +153,4 @@ struct FilterChip: View {
         .cornerRadius(20)
     }
 }
+

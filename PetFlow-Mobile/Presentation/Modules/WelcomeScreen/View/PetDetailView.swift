@@ -9,6 +9,11 @@ import SwiftUI
 
 struct PetDetailView: View {
     @StateObject private var viewModel = PetDetailViewModel()
+    @StateObject private var storage = LocalStorageService.shared
+    
+    var firstPet: LocalPet? {
+        storage.pets.first
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -45,11 +50,10 @@ struct PetDetailView: View {
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
-                                    Text(viewModel.petName).font(.system(size: 20, weight: .bold))
+                                    Text(firstPet?.name ?? "Питомец отсутствует")
                                     Image(systemName: "pencil").font(.system(size: 14))
                                 }
-                                Text(viewModel.breed).font(.system(size: 14)).foregroundColor(.gray)
-                                Text(viewModel.age).font(.system(size: 14)).foregroundColor(.gray)
+                                Text(firstPet?.type ?? "")
                             }
                             .padding(.bottom, 10)
                             Spacer()
@@ -115,90 +119,11 @@ struct PetDetailView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                hideKeyboard()
+            }
         }
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
-    }
-}
-
-
-struct DiseaseChip: View {
-    let title: String
-    let color: Color
-    let textColor: Color
-    let icon: String
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: icon)
-            Text(title)
-        }
-        .font(.system(size: 13, weight: .medium))
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(color)
-        .foregroundColor(textColor)
-        .cornerRadius(20)
-    }
-}
-
-struct VaccineRow: View {
-    let title: String
-    let date: String
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title).font(.system(size: 15, weight: .semibold))
-                Text(date).font(.system(size: 13)).foregroundColor(.gray)
-            }
-            Spacer()
-            Image(systemName: PetDetailViewImages.checkmarkIcon)
-                .foregroundColor(Color(hex: "#4A37A7"))
-        }
-        .padding()
-        .background(Color(hex: "#F0F4FF"))
-        .cornerRadius(12)
-    }
-}
-
-struct TimelineRow: View {
-    let record: HealthRecord
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(spacing: 0) {
-                Circle()
-                    .fill(Color(hex: "#4A37A7"))
-                    .frame(width: 12, height: 12)
-                Rectangle()
-                    .fill(Color(hex: "#E0E0E0"))
-                    .frame(width: 2)
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text(record.date)
-                    .font(.system(size: 10, weight: .bold))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(hex: "#E8E3FF"))
-                    .foregroundColor(Color(hex: "#4A37A7"))
-                    .cornerRadius(8)
-                
-                Text(record.title).font(.system(size: 16, weight: .bold))
-                
-                if let doc = record.doctor {
-                    Text("Терапевт: \(doc)").font(.system(size: 13)).foregroundColor(.gray)
-                }
-                
-                Text(record.description).font(.system(size: 13)).foregroundColor(.gray)
-                
-                if let file = record.fileName {
-                    HStack {
-                        Image(systemName: PetDetailViewImages.paperclipIcon)
-                        Text(file)
-                    }
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
-                }
-            }
-            .padding(.bottom, 20)
-        }
     }
 }

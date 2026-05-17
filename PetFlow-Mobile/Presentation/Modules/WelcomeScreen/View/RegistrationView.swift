@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RegistrationView: View {
     @StateObject private var viewModel = RegistrationViewModel()
+    @StateObject private var storage = LocalStorageService.shared
     @Environment(\.dismiss) var dismiss
     
     @State private var navigateToAddPet = false
@@ -56,12 +57,37 @@ struct RegistrationView: View {
                     .padding(.top, 20)
                     
                     VStack(spacing: 16) {
-                        CustomTextField(label: RegistrationViewStrings.firstName, placeholder: RegistrationViewStrings.placeholderName, text: $viewModel.firstName)
-                        CustomTextField(label: RegistrationViewStrings.lastName, placeholder: RegistrationViewStrings.placeholderLastName, text: $viewModel.lastName)
-                        CustomTextField(label: RegistrationViewStrings.email, placeholder: RegistrationViewStrings.placeholderEmail, text: $viewModel.email)
-                        CustomTextField(label: RegistrationViewStrings.password, placeholder: "••••••••", text: $viewModel.password, isSecure: true)
+                        CustomTextField(
+                            label: RegistrationViewStrings.firstName,
+                            placeholder: RegistrationViewStrings.placeholderName,
+                            text: $viewModel.firstName,
+                            hasError: viewModel.showValidationError && viewModel.firstName.isEmpty
+                        )
+                        CustomTextField(
+                            label: RegistrationViewStrings.lastName,
+                            placeholder: RegistrationViewStrings.placeholderLastName,
+                            text: $viewModel.lastName,
+                            hasError: viewModel.showValidationError && viewModel.lastName.isEmpty
+                        )
+                        CustomTextField(
+                            label: RegistrationViewStrings.email,
+                            placeholder: RegistrationViewStrings.placeholderEmail,
+                            text: $viewModel.email,
+                            keyboardType: .emailAddress,
+                            hasError: viewModel.showValidationError && viewModel.email.isEmpty
+                        )
+                        CustomTextField(
+                            label: RegistrationViewStrings.password,
+                            placeholder: "••••••••",
+                            text: $viewModel.password,
+                            isSecure: true,
+                            hasError: viewModel.showValidationError && viewModel.password.isEmpty
+                        )
                     }
-                    
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        hideKeyboard()
+                    }
                     Image(RegistrationViewImages.avatarPlaceholder)
                         .resizable()
                         .scaledToFit()
@@ -70,8 +96,34 @@ struct RegistrationView: View {
                     
                     VStack(spacing: 16) {
                         PrimaryButton(title: RegistrationViewStrings.finishRegistration, isSecondary: false) {
-                            viewModel.finishRegistration()
-                            navigateToAddPet = true
+                            Task {
+                                viewModel.finishRegistration()
+                                
+                                if viewModel.isFormValid {
+                                    
+                                    storage.currentUser = LocalUser(
+                                        firstName: viewModel.firstName,
+                                        lastName: viewModel.lastName,
+                                        email: viewModel.email,
+                                        password: viewModel.password,
+                                        phone: "",
+                                        avatar: nil
+                                    )
+                                    
+                                    navigateToAddPet = true
+                                }
+                            }
+                        }
+                        .alert(
+                            "Ошибка",
+                            isPresented: Binding(
+                                get: { viewModel.errorMessage != nil },
+                                set: { _ in viewModel.errorMessage = nil }
+                            )
+                        ) {
+                            Button("OK") {}
+                        } message: {
+                            Text(viewModel.errorMessage ?? "")
                         }
                         
                         Text(RegistrationViewStrings.termsFullAgreement)
@@ -90,5 +142,11 @@ struct RegistrationView: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+        .alert("Ошибка", isPresented: $viewModel.showValidationError) {
+            Button("OK") {}
+        } message: {
+            Text("Заполните все поля")
+        }
     }
 }
+
