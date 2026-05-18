@@ -7,81 +7,80 @@
 
 import Foundation
 
-protocol APIClientProtocol {
-    func request<T: Decodable>(
-        endpoint: String,
-        method: HTTPMethod,
-        body: Encodable?,
-        requiresAuth: Bool
-    ) async throws -> T
-}
-
 final class APIClient: APIClientProtocol {
 
-    private let tokenStorage: TokenStorageProtocol
+    static let shared = APIClient()
 
-    init(tokenStorage: TokenStorageProtocol) {
-        self.tokenStorage = tokenStorage
-    }
+    private init() {}
+
+    private let decoder = JSONDecoder()
+    private let encoder = JSONEncoder()
 
     func request<T: Decodable>(
         endpoint: String,
-        method: HTTPMethod = .GET,
+        method: String = "GET",
         body: Encodable? = nil,
         requiresAuth: Bool = false
     ) async throws -> T {
 
-        guard let url = URL(string: APIConfig.baseURL + endpoint) else {
-            throw NetworkError.invalidURL
+        guard let url = URL(string: endpoint) else {
+            throw APIError.invalidURL
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = method.rawValue
+        request.httpMethod = method
 
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         if requiresAuth,
-           let token = tokenStorage.getAccessToken() {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+           let token = TokenStorage.shared.accessToken {
+
+            request.setValue(
+                "Bearer \(token)",
+                forHTTPHeaderField: "Authorization"
+            )
         }
 
         if let body {
-            request.httpBody = try JSONEncoder().encode(AnyEncodable(body))
+            request.httpBody = try encoder.encode(AnyEncodable(body))
         }
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw NetworkError.invalidResponse
+            throw APIError.invalidResponse
         }
 
         switch httpResponse.statusCode {
+
         case 200...299:
             break
 
         case 401:
-            throw NetworkError.unauthorized
+            throw APIError.unauthorized
 
         default:
-            throw NetworkError.serverError("Ошибка: \(httpResponse.statusCode)")
+            throw APIError.serverError("Ошибка сервера")
         }
 
         do {
-            return try JSONDecoder().decode(T.self, from: data)
+            return try decoder.decode(T.self, from: data)
         } catch {
-            throw NetworkError.decodingError
+            print(error)
+            throw APIError.decodingError
         }
     }
 }
 
 struct AnyEncodable: Encodable {
-    private let encodeClosure: (Encoder) throws -> Void
+
+    private let encodeFunc: (Encoder) throws -> Void
 
     init<T: Encodable>(_ wrapped: T) {
-        encodeClosure = wrapped.encode
+        encodeFunc = wrapped.encode
     }
 
     func encode(to encoder: Encoder) throws {
-        try encodeClosure(encoder)
+        try encodeFunc(encoder)
     }
 }

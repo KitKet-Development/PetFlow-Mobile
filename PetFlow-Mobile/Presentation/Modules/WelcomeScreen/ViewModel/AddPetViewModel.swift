@@ -15,30 +15,57 @@ final class AddPetViewModel: ObservableObject {
     @Published var petName = ""
     @Published var petType = ""
 
-    @Published var petImage: UIImage?
+    @Published var isLoading = false
+    @Published var success = false
+    @Published var errorMessage: String?
 
-    let petTypes = [
-        "Собака",
-        "Кот",
-        "Попугай",
-        "Грызун",
-        "Другое"
-    ]
+    let petTypes = ["Собака", "Кот"]
 
-    private let session = AppSession.shared
+    private let createPetUseCase = CreatePetUseCase(
+        repository: DependencyContainer.shared.petRepository
+    )
 
-    func onContinueTap() async {
+    func onContinueTap(
+        image: UIImage?
+    ) {
 
-        let pet = LocalPet(
-            name: petName,
-            type: petType,
-            image: petImage
-        )
+        Task {
+            await createPet(image: image)
+        }
+    }
 
-        session.pets.append(pet)
+    private func createPet(
+        image: UIImage?
+    ) async {
+
+        do {
+
+            isLoading = true
+
+            try await createPetUseCase.execute(
+                name: petName,
+                type: petType
+            )
+
+            let localPet = LocalPet(
+                name: petName,
+                type: petType,
+                image: image
+            )
+
+            LocalStorageService.shared.pets.append(localPet)
+
+            success = true
+
+        } catch {
+
+            errorMessage = error.localizedDescription
+        }
+
+        isLoading = false
     }
 
     func onAddLaterTap() {
-        print("Skip pet")
+        success = true
     }
 }

@@ -9,18 +9,14 @@ import Foundation
 
 final class ClinicRepository: ClinicRepositoryProtocol {
 
-    private let apiClient: APIClientProtocol
-
-    init(apiClient: APIClientProtocol) {
-        self.apiClient = apiClient
-    }
+    private let client = APIClient.shared
 
     func getClinics() async throws -> [ClinicDTO] {
-        try await apiClient.request(
-            endpoint: APIConfig.Path.clinics,
-            method: .GET,
-            body: nil,
-            requiresAuth: true
+
+        try await client.request(
+            endpoint: "\(APIConfig.shared.baseURL)/clinics/",
+            requiresAuth: false
         )
     }
 }
+

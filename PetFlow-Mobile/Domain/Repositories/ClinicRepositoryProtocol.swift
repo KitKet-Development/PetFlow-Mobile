@@ -8,5 +8,6 @@
 import Foundation
 
 protocol ClinicRepositoryProtocol {
+
     func getClinics() async throws -> [ClinicDTO]
 }

@@ -7,7 +7,8 @@
 
 import Foundation
 
-final class RegisterUseCase {
+
+final class SignUpUseCase {
 
     private let repository: AuthRepositoryProtocol
 
@@ -22,13 +23,13 @@ final class RegisterUseCase {
         password: String
     ) async throws {
 
-        let dto = RegisterRequestDTO(
+        let request = SignUpRequestDTO(
             first_name: firstName,
             last_name: lastName,
             email: email,
             password: password
         )
 
-        try await repository.register(dto: dto)
+        try await repository.signup(request: request)
     }
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 final class LoginUseCase {
 
     private let repository: AuthRepositoryProtocol
@@ -15,16 +16,13 @@ final class LoginUseCase {
         self.repository = repository
     }
 
-    func execute(
-        email: String,
-        password: String
-    ) async throws {
+    func execute(email: String, password: String) async throws {
 
-        let dto = LoginRequestDTO(
+        let request = LoginRequestDTO(
             email: email,
             password: password
         )
 
-        _ = try await repository.login(dto: dto)
+        try await repository.login(request: request)
     }
 }

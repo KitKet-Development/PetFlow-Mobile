@@ -15,7 +15,7 @@ final class UpdateProfileUseCase {
         self.repository = repository
     }
 
-    func execute(dto: UserProfileDTO) async throws {
+    func execute(dto: UpdateUserDTO) async throws {
         try await repository.updateProfile(dto: dto)
     }
 }

@@ -17,21 +17,13 @@ final class WelcomeViewModel: ObservableObject {
     private let tokenStorage: TokenStorageProtocol
 
     init(
-        tokenStorage: TokenStorageProtocol = AppContainer.shared.tokenStorage
+        tokenStorage: TokenStorageProtocol = DependencyContainer.shared.tokenStorage
     ) {
         self.tokenStorage = tokenStorage
         checkAuth()
     }
 
     func checkAuth() {
-        isAuthorized = tokenStorage.getAccessToken() != nil
-    }
-
-    func onRegistrationTap() {
-        print("Open registration")
-    }
-
-    func onLoginTap() {
-        print("Open login")
+        isAuthorized = tokenStorage.accessToken != nil
     }
 }

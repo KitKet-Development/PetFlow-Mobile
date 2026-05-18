@@ -20,14 +20,14 @@ final class CreatePetUseCase {
         type: String
     ) async throws {
 
-        let dto = PetDTO(
-            id: nil,
+        let speciesId = type == "Собака" ? 1 : 2
+
+        let request = CreatePetRequestDTO(
             name: name,
-            breed: nil,
-            age: nil,
-            type: type
+            species: speciesId,
+            breed: nil
         )
 
-        try await repository.createPet(dto: dto)
+        try await repository.createPet(request: request)
     }
 }

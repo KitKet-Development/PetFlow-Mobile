@@ -8,10 +8,8 @@
 import Foundation
 
 struct ClinicDTO: Codable, Identifiable {
+
     let id: Int
     let name: String
-    let address: String?
-    let rating: Double?
     let description: String?
-    let phone: String?
 }

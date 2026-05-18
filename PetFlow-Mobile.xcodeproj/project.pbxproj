@@ -10,9 +10,22 @@
 		2FCE27552FADBA2A00B8FB4E /* PetFlow-Mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PetFlow-Mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2FBBC6FC2FBAC4F30056AEF4 /* Exceptions for "PetFlow-Mobile" folder in "PetFlow-Mobile" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2FCE27542FADBA2A00B8FB4E /* PetFlow-Mobile */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2FCE27572FADBA2A00B8FB4E /* PetFlow-Mobile */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2FBBC6FC2FBAC4F30056AEF4 /* Exceptions for "PetFlow-Mobile" folder in "PetFlow-Mobile" target */,
+			);
 			path = "PetFlow-Mobile";
 			sourceTree = "<group>";
 		};
@@ -256,6 +269,7 @@
 				DEVELOPMENT_TEAM = 7K65YGGWWF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PetFlow-Mobile/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +302,7 @@
 				DEVELOPMENT_TEAM = 7K65YGGWWF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PetFlow-Mobile/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

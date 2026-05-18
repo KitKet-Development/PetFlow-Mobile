@@ -8,24 +8,43 @@
 import Foundation
 
 protocol TokenStorageProtocol {
-    func saveAccessToken(_ token: String)
-    func getAccessToken() -> String?
+
+    var accessToken: String? { get set }
+
+    var refreshToken: String? { get set }
+
     func clear()
 }
 
 final class TokenStorage: TokenStorageProtocol {
 
-    private let tokenKey = "access_token"
+    static let shared = TokenStorage()
 
-    func saveAccessToken(_ token: String) {
-        UserDefaults.standard.set(token, forKey: tokenKey)
+    private init() {}
+
+    private let accessTokenKey = "access_token"
+    private let refreshTokenKey = "refresh_token"
+
+    var accessToken: String? {
+        get {
+            UserDefaults.standard.string(forKey: accessTokenKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: accessTokenKey)
+        }
     }
 
-    func getAccessToken() -> String? {
-        UserDefaults.standard.string(forKey: tokenKey)
+    var refreshToken: String? {
+        get {
+            UserDefaults.standard.string(forKey: refreshTokenKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: refreshTokenKey)
+        }
     }
 
     func clear() {
-        UserDefaults.standard.removeObject(forKey: tokenKey)
+        UserDefaults.standard.removeObject(forKey: accessTokenKey)
+        UserDefaults.standard.removeObject(forKey: refreshTokenKey)
     }
 }

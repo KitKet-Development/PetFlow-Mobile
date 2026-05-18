@@ -8,8 +8,10 @@
 import Foundation
 
 protocol ProfileRepositoryProtocol {
-    func getProfile() async throws -> UserProfileDTO
-    func updateProfile(dto: UserProfileDTO) async throws
+
+    func getProfile() async throws -> UserDTO
+
+    func updateProfile(dto: UpdateUserDTO) async throws
 }
 
 final class ProfileRepository: ProfileRepositoryProtocol {
@@ -20,19 +22,21 @@ final class ProfileRepository: ProfileRepositoryProtocol {
         self.apiClient = apiClient
     }
 
-    func getProfile() async throws -> UserProfileDTO {
+    func getProfile() async throws -> UserDTO {
+
         try await apiClient.request(
-            endpoint: APIConfig.Path.profile,
-            method: .GET,
+            endpoint: APIConfig.shared.profileURL,
+            method: "GET",
             body: nil,
             requiresAuth: true
         )
     }
 
-    func updateProfile(dto: UserProfileDTO) async throws {
-        let _: UserProfileDTO = try await apiClient.request(
-            endpoint: APIConfig.Path.profile,
-            method: .PATCH,
+    func updateProfile(dto: UpdateUserDTO) async throws {
+
+        let _: UserDTO = try await apiClient.request(
+            endpoint: APIConfig.shared.profileURL,
+            method: "PATCH",
             body: dto,
             requiresAuth: true
         )

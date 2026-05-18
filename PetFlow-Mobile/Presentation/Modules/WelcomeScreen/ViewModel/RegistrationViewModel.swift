@@ -8,8 +8,6 @@
 import Foundation
 import Combine
 
-import Foundation
-
 @MainActor
 final class RegistrationViewModel: ObservableObject {
 
@@ -18,31 +16,38 @@ final class RegistrationViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
 
-    @Published var showValidationError = false
+    @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var registrationSuccess = false
 
-    private let session = AppSession.shared
-
-    var isFormValid: Bool {
-        !firstName.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !lastName.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !email.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !password.trimmingCharacters(in: .whitespaces).isEmpty
-    }
+    private let signUpUseCase = DependencyContainer.shared.signUpUseCase
 
     func finishRegistration() {
-        guard isFormValid else {
-            showValidationError = true
-            return
+
+        Task {
+            await register()
+        }
+    }
+
+    private func register() async {
+
+        do {
+
+            isLoading = true
+
+            try await signUpUseCase.execute(
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password
+            )
+
+            registrationSuccess = true
+
+        } catch {
+            errorMessage = error.localizedDescription
         }
 
-        let userData = [
-            "first_name": firstName,
-            "last_name": lastName,
-            "email": email,
-            "password": password
-        ]
-
-        print("Отправка данных на BackEnd: \(userData)")
+        isLoading = false
     }
 }

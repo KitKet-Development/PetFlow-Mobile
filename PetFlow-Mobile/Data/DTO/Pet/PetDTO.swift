@@ -8,9 +8,10 @@
 import Foundation
 
 struct PetDTO: Codable, Identifiable {
-    let id: Int?
+    
+    let id: Int
     let name: String
+    let species: Int
     let breed: Int?
-    let age: Int?
-    let type: String?
+    let photo: String?
 }

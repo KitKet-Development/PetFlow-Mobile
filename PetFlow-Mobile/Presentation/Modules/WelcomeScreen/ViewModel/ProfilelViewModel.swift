@@ -31,6 +31,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var userName = ""
     @Published var userEmail = ""
 
+    @Published var id = 0
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var phone = ""
@@ -48,15 +49,9 @@ final class ProfileViewModel: ObservableObject {
     private let getPetsUseCase: GetPetsUseCase
 
     init(
-        getProfileUseCase: GetProfileUseCase = GetProfileUseCase(
-            repository: AppContainer.shared.profileRepository
-        ),
-        updateProfileUseCase: UpdateProfileUseCase = UpdateProfileUseCase(
-            repository: AppContainer.shared.profileRepository
-        ),
-        getPetsUseCase: GetPetsUseCase = GetPetsUseCase(
-            repository: AppContainer.shared.petRepository
-        )
+        getProfileUseCase: GetProfileUseCase = DependencyContainer.shared.getProfileUseCase,
+        updateProfileUseCase: UpdateProfileUseCase = DependencyContainer.shared.updateProfileUseCase,
+        getPetsUseCase: GetPetsUseCase = DependencyContainer.shared.getPetsUseCase
     ) {
         self.getProfileUseCase = getProfileUseCase
         self.updateProfileUseCase = updateProfileUseCase
@@ -66,14 +61,15 @@ final class ProfileViewModel: ObservableObject {
     func loadProfile() async {
 
         do {
+
             isLoading = true
 
             let profile = try await getProfileUseCase.execute()
 
+            id = profile.id
             firstName = profile.first_name
             lastName = profile.last_name
             email = profile.email
-            phone = profile.phone ?? ""
 
             userName = "\(profile.first_name) \(profile.last_name)"
             userEmail = profile.email
@@ -81,6 +77,7 @@ final class ProfileViewModel: ObservableObject {
             isLoading = false
 
         } catch {
+
             isLoading = false
             errorMessage = error.localizedDescription
         }
@@ -89,26 +86,33 @@ final class ProfileViewModel: ObservableObject {
     func saveChanges() async {
 
         do {
+
             isLoading = true
 
-            let dto = UserProfileDTO(
+            let dto = UpdateUserDTO(
                 first_name: firstName,
                 last_name: lastName,
-                email: email,
-                phone: phone
+                email: email
             )
 
             try await updateProfileUseCase.execute(dto: dto)
 
+            userName = "\(firstName) \(lastName)"
+            userEmail = email
+
             isLoading = false
 
         } catch {
+
             isLoading = false
             errorMessage = error.localizedDescription
         }
     }
 
     func deleteAccount() {
-        print("DELETE /profile")
+
+        TokenStorage.shared.clear()
+
+        AppSession.shared.logout()
     }
 }

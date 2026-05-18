@@ -10,7 +10,8 @@ import SwiftUI
 struct ClinicCatalogView: View {
     @State private var searchText = ""
     @State private var selectedFilter = "Все"
-    @State private var selectedClinic: Clinic? = nil
+    @State private var selectedClinic: ClinicDTO? = nil
+    @StateObject private var viewModel = ClinicCatalogViewModel()
     
     let allClinics = [
         Clinic(name: "ЗооЦентр «Пушистики»", address: "ул. Ленина, 45", distance: "1.2 км", rating: "4.9", price: "₽₽", category: "Кошки", description: "Лучшая клиника для ваших котиков с современным оборудованием.", phone: "+7 (999) 123-45-67", workingHours: "09:00 - 21:00", imageName: "clinic_1"),
@@ -65,13 +66,9 @@ struct ClinicCatalogView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    ForEach(filteredClinics) { clinic in
+                    ForEach(viewModel.clinics) { clinic in
                         ClinicCard(
                             name: clinic.name,
-                            address: clinic.address,
-                            distance: clinic.distance,
-                            rating: clinic.rating,
-                            price: clinic.price
                         )
                         .onTapGesture {
                             selectedClinic = clinic
@@ -82,15 +79,18 @@ struct ClinicCatalogView: View {
             }
         }
         .background(Color(hex: "#F8F9FE"))
+        .onAppear {
+            viewModel.fetchClinics()
+        }
     }
 }
 
 struct ClinicCard: View {
     let name: String
-    let address: String
-    let distance: String
-    let rating: String
-    let price: String
+    let address: String = ""
+    let distance: String = ""
+    let rating: String = ""
+    let price: String = ""
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {

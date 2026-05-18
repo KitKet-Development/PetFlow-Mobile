@@ -10,6 +10,7 @@ import SwiftUI
 struct WelcomeView: View {
     @StateObject private var viewModel = WelcomeViewModel()
     @State private var showRegistration = false
+    @State private var showLogin = false
     
     var body: some View {
         NavigationStack{
@@ -45,7 +46,7 @@ struct WelcomeView: View {
                     }
                     
                     PrimaryButton(title: WelcomeViewStrings.login, isSecondary: true) {
-                        viewModel.onLoginTap()
+                        showLogin = true
                     }
                 }
                 .padding(.horizontal, 20)
@@ -68,6 +69,9 @@ struct WelcomeView: View {
             .background(Color(hex: "#F8F9FE").ignoresSafeArea())
             .navigationDestination(isPresented: $showRegistration) {
                 RegistrationView()
+            }
+            .navigationDestination(isPresented: $showLogin) {
+                LoginView()
             }
         }
         

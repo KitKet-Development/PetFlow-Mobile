@@ -7,20 +7,19 @@
 
 import Foundation
 
-struct APIConfig {
-    static let baseURL = "https://your-api-domain.com"
+final class APIConfig {
 
-    struct Path {
-        static let login = "/api/v1/auth/login/"
-        static let signup = "/api/v1/auth/signup/"
+    static let shared = APIConfig()
 
-        static let clinics = "/api/v1/clinics/"
+    private init() {}
 
-        static let pets = "/api/v1/pets/"
-        static let breeds = "/api/v1/breeds/"
+    let baseURL = "http://192.168.1.58:8000/api/v1"
 
-        static let bookings = "/api/v1/bookings/"
+    var authBaseURL: String {
+        "\(baseURL)/auth"
+    }
 
-        static let profile = "/api/v1/profile/"
+    var profileURL: String {
+        "\(baseURL)/profile/"
     }
 }

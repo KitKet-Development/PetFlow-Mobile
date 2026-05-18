@@ -99,15 +99,23 @@ struct AddPetView: View {
                     }
 
                     VStack(spacing: 16) {
-                        PrimaryButton(title: AddPetViewStrings.continueButton, isSecondary: false) {
-                            let pet = LocalPet(
-                                name: viewModel.petName,
-                                type: viewModel.petType,
+                        PrimaryButton(
+                            title: viewModel.isLoading
+                            ? "Загрузка..."
+                            : AddPetViewStrings.continueButton,
+                            isSecondary: false
+                        ) {
+
+                            viewModel.onContinueTap(
                                 image: petUIImage
                             )
-                            storage.pets.append(pet)
                         }
-
+                        .disabled(viewModel.isLoading)
+                        .onChange(of: viewModel.success) { _, success in
+                            if success {
+                                isRegistrationFinished = true
+                            }
+                        }
                         Button(action: {
                             viewModel.onAddLaterTap()
                             isRegistrationFinished = true
@@ -129,6 +137,17 @@ struct AddPetView: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+        .alert(
+            "Ошибка",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { _ in viewModel.errorMessage = nil }
+            )
+        ) {
+            Button("OK") {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
     }
 
     @MainActor

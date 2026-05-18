@@ -61,27 +61,27 @@ struct RegistrationView: View {
                             label: RegistrationViewStrings.firstName,
                             placeholder: RegistrationViewStrings.placeholderName,
                             text: $viewModel.firstName,
-                            hasError: viewModel.showValidationError && viewModel.firstName.isEmpty
+                            
                         )
                         CustomTextField(
                             label: RegistrationViewStrings.lastName,
                             placeholder: RegistrationViewStrings.placeholderLastName,
                             text: $viewModel.lastName,
-                            hasError: viewModel.showValidationError && viewModel.lastName.isEmpty
+                            
                         )
                         CustomTextField(
                             label: RegistrationViewStrings.email,
                             placeholder: RegistrationViewStrings.placeholderEmail,
                             text: $viewModel.email,
                             keyboardType: .emailAddress,
-                            hasError: viewModel.showValidationError && viewModel.email.isEmpty
+                            
                         )
                         CustomTextField(
                             label: RegistrationViewStrings.password,
                             placeholder: "••••••••",
                             text: $viewModel.password,
                             isSecure: true,
-                            hasError: viewModel.showValidationError && viewModel.password.isEmpty
+                            
                         )
                     }
                     .contentShape(Rectangle())
@@ -98,32 +98,13 @@ struct RegistrationView: View {
                         PrimaryButton(title: RegistrationViewStrings.finishRegistration, isSecondary: false) {
                             Task {
                                 viewModel.finishRegistration()
-                                
-                                if viewModel.isFormValid {
-                                    
-                                    storage.currentUser = LocalUser(
-                                        firstName: viewModel.firstName,
-                                        lastName: viewModel.lastName,
-                                        email: viewModel.email,
-                                        password: viewModel.password,
-                                        phone: "",
-                                        avatar: nil
-                                    )
-                                    
-                                    navigateToAddPet = true
-                                }
                             }
                         }
-                        .alert(
-                            "Ошибка",
-                            isPresented: Binding(
-                                get: { viewModel.errorMessage != nil },
-                                set: { _ in viewModel.errorMessage = nil }
-                            )
-                        ) {
-                            Button("OK") {}
-                        } message: {
-                            Text(viewModel.errorMessage ?? "")
+                        .onChange(of: viewModel.registrationSuccess) { _, success in
+                            
+                            if success {
+                                navigateToAddPet = true
+                            }
                         }
                         
                         Text(RegistrationViewStrings.termsFullAgreement)
@@ -142,10 +123,16 @@ struct RegistrationView: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
-        .alert("Ошибка", isPresented: $viewModel.showValidationError) {
+        .alert(
+            "Ошибка",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { _ in viewModel.errorMessage = nil }
+            )
+        ) {
             Button("OK") {}
         } message: {
-            Text("Заполните все поля")
+            Text(viewModel.errorMessage ?? "")
         }
     }
 }

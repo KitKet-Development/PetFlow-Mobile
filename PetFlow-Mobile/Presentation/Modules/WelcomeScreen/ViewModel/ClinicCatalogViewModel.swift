@@ -12,28 +12,30 @@ import Combine
 final class ClinicCatalogViewModel: ObservableObject {
 
     @Published var clinics: [ClinicDTO] = []
+
     @Published var isLoading = false
 
-    private let useCase: GetClinicsUseCase
+    private let repository = DependencyContainer.shared.clinicRepository
 
-    init(
-        useCase: GetClinicsUseCase = GetClinicsUseCase(
-            repository: AppContainer.shared.clinicRepository
-        )
-    ) {
-        self.useCase = useCase
+    func fetchClinics() {
+
+        Task {
+            await loadClinics()
+        }
     }
 
-    func loadClinics() async {
+    private func loadClinics() async {
 
         do {
+
             isLoading = true
-            clinics = try await useCase.execute()
-            isLoading = false
+
+            clinics = try await repository.getClinics()
 
         } catch {
-            isLoading = false
             print(error.localizedDescription)
         }
+
+        isLoading = false
     }
 }

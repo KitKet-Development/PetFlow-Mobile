@@ -57,10 +57,10 @@ final class BookingViewModel: ObservableObject {
 
     init(
         bookingUseCase: CreateBookingUseCase = CreateBookingUseCase(
-            repository: AppContainer.shared.bookingRepository
+            repository: DependencyContainer.shared.bookingRepository
         ),
         getPetsUseCase: GetPetsUseCase = GetPetsUseCase(
-            repository: AppContainer.shared.petRepository
+            repository: DependencyContainer.shared.petRepository
         )
     ) {
         self.bookingUseCase = bookingUseCase
@@ -107,7 +107,7 @@ final class BookingViewModel: ObservableObject {
                 booking_time: selectedTime
             )
 
-            try await bookingUseCase.execute(dto: dto)
+            //try await bookingUseCase.execute(dto: dto)
 
             isLoading = false
 

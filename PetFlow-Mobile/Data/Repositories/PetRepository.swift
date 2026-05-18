@@ -9,26 +9,22 @@ import Foundation
 
 final class PetRepository: PetRepositoryProtocol {
 
-    private let apiClient: APIClientProtocol
+    private let client = APIClient.shared
 
-    init(apiClient: APIClientProtocol) {
-        self.apiClient = apiClient
-    }
+    func getPets() async throws -> [PetDTO] {
 
-    func createPet(dto: PetDTO) async throws {
-        let _: PetDTO = try await apiClient.request(
-            endpoint: APIConfig.Path.pets,
-            method: .POST,
-            body: dto,
+        try await client.request(
+            endpoint: "\(APIConfig.shared.baseURL)/pets/",
             requiresAuth: true
         )
     }
 
-    func getPets() async throws -> [PetDTO] {
-        try await apiClient.request(
-            endpoint: APIConfig.Path.pets,
-            method: .GET,
-            body: nil,
+    func createPet(request: CreatePetRequestDTO) async throws {
+
+        let _: PetDTO = try await client.request(
+            endpoint: "\(APIConfig.shared.baseURL)/pets/",
+            method: "POST",
+            body: request,
             requiresAuth: true
         )
     }

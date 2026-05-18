@@ -7,7 +7,8 @@
 
 import Foundation
 
-enum NetworkError: LocalizedError {
+enum APIError: LocalizedError {
+
     case invalidURL
     case invalidResponse
     case unauthorized
@@ -19,14 +20,19 @@ enum NetworkError: LocalizedError {
         switch self {
         case .invalidURL:
             return "Некорректный URL"
+
         case .invalidResponse:
             return "Некорректный ответ сервера"
+
         case .unauthorized:
-            return "Необходима авторизация"
+            return "Ошибка авторизации"
+
         case .decodingError:
-            return "Ошибка декодирования"
+            return "Ошибка обработки данных"
+
         case .serverError(let message):
             return message
+
         case .unknown:
             return "Неизвестная ошибка"
         }

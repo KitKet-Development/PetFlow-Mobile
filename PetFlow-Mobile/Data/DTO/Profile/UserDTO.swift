@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct UserProfileDTO: Codable {
+struct UserDTO: Codable, Identifiable {
+    let id: Int
     let first_name: String
     let last_name: String
     let email: String
-    let phone: String?
 }

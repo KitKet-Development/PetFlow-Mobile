@@ -9,37 +9,30 @@ import Foundation
 
 final class AuthRepository: AuthRepositoryProtocol {
 
-    private let apiClient: APIClientProtocol
-    private let tokenStorage: TokenStorageProtocol
+    private let client = APIClient.shared
 
-    init(
-        apiClient: APIClientProtocol,
-        tokenStorage: TokenStorageProtocol
-    ) {
-        self.apiClient = apiClient
-        self.tokenStorage = tokenStorage
-    }
+    func signup(request: SignUpRequestDTO) async throws {
 
-    func register(dto: RegisterRequestDTO) async throws {
-        let _: RegisterRequestDTO = try await apiClient.request(
-            endpoint: APIConfig.Path.signup,
-            method: .POST,
-            body: dto,
-            requiresAuth: false
+        let endpoint = "\(APIConfig.shared.authBaseURL)/signup/"
+
+        let _: UserDTO = try await client.request(
+            endpoint: endpoint,
+            method: "POST",
+            body: request
         )
     }
 
-    func login(dto: LoginRequestDTO) async throws -> TokenResponseDTO {
+    func login(request: LoginRequestDTO) async throws {
 
-        let response: TokenResponseDTO = try await apiClient.request(
-            endpoint: APIConfig.Path.login,
-            method: .POST,
-            body: dto,
-            requiresAuth: false
+        let endpoint = "\(APIConfig.shared.authBaseURL)/login/"
+
+        let response: TokenResponseDTO = try await client.request(
+            endpoint: endpoint,
+            method: "POST",
+            body: request
         )
 
-        tokenStorage.saveAccessToken(response.access)
-
-        return response
+        TokenStorage.shared.accessToken = response.access
+        TokenStorage.shared.refreshToken = response.refresh
     }
 }

@@ -5,3 +5,9 @@
 //  Created by Stepan Kolenkin on 16.05.2026.
 //
 
+import Foundation
+
+struct SpeciesDTO: Codable, Identifiable {
+    let id: Int
+    let name: String
+}

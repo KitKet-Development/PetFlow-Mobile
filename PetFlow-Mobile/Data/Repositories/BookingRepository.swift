@@ -8,23 +8,23 @@
 import Foundation
 
 protocol BookingRepositoryProtocol {
-    func createBooking(dto: BookingDTO) async throws
+    //func createBooking(dto: BookingDTO) async throws
 }
 
-final class BookingRepository: BookingRepositoryProtocol {
-
-    private let apiClient: APIClientProtocol
-
-    init(apiClient: APIClientProtocol) {
-        self.apiClient = apiClient
-    }
-
-    func createBooking(dto: BookingDTO) async throws {
-        let _: BookingDTO = try await apiClient.request(
-            endpoint: APIConfig.Path.bookings,
-            method: .POST,
-            body: dto,
-            requiresAuth: true
-        )
-    }
-}
+//final class BookingRepository: BookingRepositoryProtocol {
+//
+//    private let apiClient: APIClientProtocol
+//
+//    init(apiClient: APIClientProtocol) {
+//        self.apiClient = apiClient
+//    }
+//
+//    func createBooking(dto: BookingDTO) async throws {
+//        let _: BookingDTO = try await apiClient.request(
+//            endpoint: APIConfig.Path.bookings,
+//            method: .POST,
+//            body: dto,
+//            requiresAuth: true
+//        )
+//    }
+//}
