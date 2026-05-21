@@ -8,6 +8,7 @@
 import Foundation
 
 struct TokenResponseDTO: Codable {
+
     let access: String
-    let refresh: String?
+    let refresh: String
 }

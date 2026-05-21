@@ -5,7 +5,7 @@
 //  Created by Stepan Kolenkin on 15.05.2026.
 //
 
-import Foundation
+import SwiftUI
 import Combine
 
 struct PetMock: Identifiable {
@@ -28,84 +28,122 @@ struct BookingMock: Identifiable {
 @MainActor
 final class ProfileViewModel: ObservableObject {
 
-    @Published var userName = ""
-    @Published var userEmail = ""
-
     @Published var id = 0
+
     @Published var firstName = ""
     @Published var lastName = ""
     @Published var phone = ""
     @Published var email = ""
     @Published var password = ""
 
-    @Published var pets: [PetMock] = []
-    @Published var bookings: [BookingMock] = []
+    @Published var avatarURL: String?
+    @Published var avatarImage: UIImage?
 
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    @Published var bookings: [BookingMock] = []
+    @Published var pets: [ProfilePetUIModel] = []
+
     private let getProfileUseCase: GetProfileUseCase
     private let updateProfileUseCase: UpdateProfileUseCase
-    private let getPetsUseCase: GetPetsUseCase
+    private let getSpeciesUseCase: GetSpeciesUseCase
 
     init(
-        getProfileUseCase: GetProfileUseCase = DependencyContainer.shared.getProfileUseCase,
-        updateProfileUseCase: UpdateProfileUseCase = DependencyContainer.shared.updateProfileUseCase,
-        getPetsUseCase: GetPetsUseCase = DependencyContainer.shared.getPetsUseCase
+        getProfileUseCase: GetProfileUseCase,
+        updateProfileUseCase: UpdateProfileUseCase,
+        getSpeciesUseCase: GetSpeciesUseCase
     ) {
         self.getProfileUseCase = getProfileUseCase
         self.updateProfileUseCase = updateProfileUseCase
-        self.getPetsUseCase = getPetsUseCase
+        self.getSpeciesUseCase = getSpeciesUseCase
+    }
+
+    @MainActor
+    static func makeDefault() -> ProfileViewModel {
+        let container = DependencyContainer.shared
+        return ProfileViewModel(
+            getProfileUseCase: container.getProfileUseCase,
+            updateProfileUseCase: container.updateProfileUseCase,
+            getSpeciesUseCase: container.getSpeciesUseCase
+        )
+    }
+
+    var fullName: String {
+        "\(firstName) \(lastName)"
     }
 
     func loadProfile() async {
 
         do {
-
             isLoading = true
+            errorMessage = nil
 
-            let profile = try await getProfileUseCase.execute()
+            let userID = UserDefaults.standard.integer(
+                forKey: "current_user_id"
+            )
 
-            id = profile.id
-            firstName = profile.first_name
-            lastName = profile.last_name
-            email = profile.email
+            async let profileTask = getProfileUseCase.execute(userID: userID)
+            async let speciesTask = getSpeciesUseCase.execute()
 
-            userName = "\(profile.first_name) \(profile.last_name)"
-            userEmail = profile.email
+            let (profile, speciesList) = try await (profileTask, speciesTask)
+
+            let speciesMap = Dictionary(
+                uniqueKeysWithValues: speciesList.map { ($0.id, $0.name) }
+            )
+
+            id = profile.id ?? 0
+            firstName = profile.first_name ?? ""
+            lastName = profile.last_name ?? ""
+            email = profile.email ?? ""
+            phone = profile.phone ?? ""
+            avatarURL = profile.avatar
+
+            pets = (profile.pets ?? []).map {
+                ProfilePetUIModel(
+                    id: $0.id,
+                    name: $0.name,
+                    species: speciesMap[$0.species ?? 0] ?? "Питомец",
+                    breed: $0.breed?.name ?? "",
+                    imageURL: $0.photo
+                )
+            }
 
             isLoading = false
 
         } catch {
-
             isLoading = false
             errorMessage = error.localizedDescription
+            print(error)
         }
     }
 
     func saveChanges() async {
 
         do {
-
             isLoading = true
 
             let dto = UpdateUserDTO(
                 first_name: firstName,
                 last_name: lastName,
-                email: email
+                email: email,
+                phone: phone,
+                avatar: avatarImage?.jpegData(compressionQuality: 0.8)
             )
 
-            try await updateProfileUseCase.execute(dto: dto)
+            try await updateProfileUseCase.execute(
+                userID: id,
+                dto: dto
+            )
 
-            userName = "\(firstName) \(lastName)"
-            userEmail = email
+            await loadProfile()
 
             isLoading = false
 
         } catch {
-
             isLoading = false
             errorMessage = error.localizedDescription
+            print(error)
         }
     }
 

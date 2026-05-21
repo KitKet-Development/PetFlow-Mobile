@@ -7,6 +7,13 @@
 
 import Foundation
 
+struct ClinicFilterParams {
+    var minRating: Double? = nil
+    var species: Int? = nil
+    var city: String? = nil
+    var search: String? = nil
+}
+
 final class GetClinicsUseCase {
 
     private let repository: ClinicRepositoryProtocol
@@ -15,7 +22,7 @@ final class GetClinicsUseCase {
         self.repository = repository
     }
 
-    func execute() async throws -> [ClinicDTO] {
-        try await repository.getClinics()
+    func execute(filters: ClinicFilterParams = ClinicFilterParams()) async throws -> [ClinicDTO] {
+        try await repository.getClinics(filters: filters)
     }
 }

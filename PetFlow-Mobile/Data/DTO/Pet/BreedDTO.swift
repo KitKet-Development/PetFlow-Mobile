@@ -9,4 +9,10 @@ struct BreedDTO: Codable, Identifiable {
 
     let id: Int
     let name: String
+    let species: SpeciesDTO
+}
+
+struct BreedReadSimpleDTO: Codable, Identifiable {
+    let id: Int
+    let name: String
 }

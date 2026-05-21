@@ -12,8 +12,8 @@ final class DependencyContainer {
     private init() {}
     
     lazy var bookingRepository: BookingRepositoryProtocol = {
-        
-    }() as! BookingRepositoryProtocol
+        BookingRepository(apiClient: apiClient)
+    }()
 
     // MARK: - API Client
 
@@ -34,9 +34,17 @@ final class DependencyContainer {
     lazy var clinicRepository: ClinicRepositoryProtocol = {
         ClinicRepository()
     }()
+    
+    lazy var getClinicsUseCase: GetClinicsUseCase = {
+        GetClinicsUseCase(repository: clinicRepository)
+    }()
 
     lazy var profileRepository: ProfileRepositoryProtocol = {
         ProfileRepository(apiClient: apiClient)
+    }()
+
+    lazy var petMetaRepository: PetMetaRepositoryProtocol = {
+        PetMetaRepository(apiClient: APIClient.shared)
     }()
 
     // MARK: - UseCases
@@ -53,6 +61,14 @@ final class DependencyContainer {
         CreatePetUseCase(repository: petRepository)
     }()
 
+    lazy var createBookingUseCase: CreateBookingUseCase = {
+        CreateBookingUseCase(repository: bookingRepository)
+    }()
+
+    lazy var getUserAppointmentsUseCase: GetUserAppointmentsUseCase = {
+        GetUserAppointmentsUseCase(repository: bookingRepository)
+    }()
+
     lazy var getPetsUseCase: GetPetsUseCase = {
         GetPetsUseCase(repository: petRepository)
     }()
@@ -67,5 +83,17 @@ final class DependencyContainer {
     
     lazy var tokenStorage: TokenStorageProtocol = {
         TokenStorage.shared
+    }()
+
+    lazy var getSpeciesUseCase: GetSpeciesUseCase = {
+        GetSpeciesUseCase(repository: petMetaRepository)
+    }()
+
+    lazy var getBreedsUseCase: GetBreedsUseCase = {
+        GetBreedsUseCase(repository: petMetaRepository)
+    }()
+    
+    lazy var getSlotsUseCase: GetSlotsUseCase = {
+        GetSlotsUseCase(repository: clinicRepository)
     }()
 }

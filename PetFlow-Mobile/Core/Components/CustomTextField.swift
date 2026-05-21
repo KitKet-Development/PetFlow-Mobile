@@ -56,16 +56,6 @@ struct CustomTextField: View {
                             .keyboardType(keyboardType)
                     }
                 }
-                
-                if isSecure {
-                    
-                    Button {
-                        isPasswordVisible.toggle()
-                    } label: {
-                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
-                            .foregroundColor(.gray)
-                    }
-                }
             }
             .padding()
             .frame(height: 52)

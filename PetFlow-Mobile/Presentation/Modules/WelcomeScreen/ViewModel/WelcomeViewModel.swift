@@ -17,7 +17,7 @@ final class WelcomeViewModel: ObservableObject {
     private let tokenStorage: TokenStorageProtocol
 
     init(
-        tokenStorage: TokenStorageProtocol = DependencyContainer.shared.tokenStorage
+        tokenStorage: TokenStorageProtocol
     ) {
         self.tokenStorage = tokenStorage
         checkAuth()

@@ -15,7 +15,7 @@ final class CreateBookingUseCase {
         self.repository = repository
     }
 
-//    func execute(dto: BookingDTO) async throws {
-//        try await repository.createBooking(dto: dto)
-//    }
+    func execute(clinicId: Int, dto: AppointmentWriteDTO) async throws {
+        try await repository.createBooking(clinicId: clinicId, dto: dto)
+    }
 }

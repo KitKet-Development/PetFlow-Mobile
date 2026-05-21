@@ -12,6 +12,7 @@ enum APIError: LocalizedError {
     case invalidURL
     case invalidResponse
     case unauthorized
+    case forbidden
     case decodingError
     case serverError(String)
     case unknown
@@ -26,6 +27,9 @@ enum APIError: LocalizedError {
 
         case .unauthorized:
             return "Ошибка авторизации"
+
+        case .forbidden:
+            return "Доступ запрещен"
 
         case .decodingError:
             return "Ошибка обработки данных"

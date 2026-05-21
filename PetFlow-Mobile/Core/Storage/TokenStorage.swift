@@ -24,6 +24,19 @@ final class TokenStorage: TokenStorageProtocol {
 
     private let accessTokenKey = "access_token"
     private let refreshTokenKey = "refresh_token"
+    
+    private let userIdKey = "user_id"
+
+    var userId: Int? {
+
+        get {
+            UserDefaults.standard.integer(forKey: userIdKey)
+        }
+
+        set {
+            UserDefaults.standard.set(newValue, forKey: userIdKey)
+        }
+    }
 
     var accessToken: String? {
         get {
@@ -46,5 +59,7 @@ final class TokenStorage: TokenStorageProtocol {
     func clear() {
         UserDefaults.standard.removeObject(forKey: accessTokenKey)
         UserDefaults.standard.removeObject(forKey: refreshTokenKey)
+        UserDefaults.standard.removeObject(forKey: userIdKey)
+        UserDefaults.standard.removeObject(forKey: "current_user_id")
     }
 }

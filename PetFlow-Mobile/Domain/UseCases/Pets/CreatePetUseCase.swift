@@ -5,7 +5,7 @@
 //  Created by Stepan Kolenkin on 16.05.2026.
 //
 
-import Foundation
+import SwiftUI
 
 final class CreatePetUseCase {
 
@@ -17,10 +17,9 @@ final class CreatePetUseCase {
 
     func execute(
         name: String,
-        type: String
+        speciesId: Int,
+        image: UIImage? = nil
     ) async throws {
-
-        let speciesId = type == "Собака" ? 1 : 2
 
         let request = CreatePetRequestDTO(
             name: name,

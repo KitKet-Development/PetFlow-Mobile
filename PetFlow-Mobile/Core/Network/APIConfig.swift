@@ -19,7 +19,19 @@ final class APIConfig {
         "\(baseURL)/auth"
     }
 
-    var profileURL: String {
-        "\(baseURL)/profile/"
+    func profileURL(userID: Int) -> String {
+        "\(baseURL)/users/\(userID)/"
     }
+    
+    var breedsURL: String {
+        "\(baseURL)/breeds/"
+    }
+
+    var speciesURL: String {
+        "\(baseURL)/species/"
+    }
+    
+    var petsURL: String {
+            "\(baseURL)/pets/"
+        }
 }

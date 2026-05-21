@@ -7,11 +7,20 @@
 
 import SwiftUI
 
+struct ProfilePetUIModel: Identifiable {
+
+    let id: Int
+    let name: String
+    let species: String
+    let breed: String
+    let imageURL: String?
+}
+
 struct ProfileView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var viewModel = ProfileViewModel()
+    @StateObject private var viewModel = ProfileViewModel.makeDefault()
     @State private var showLogoutAlert = false
-    @StateObject private var storage = LocalStorageService.shared
+    
     
     @State private var isEditingProfile = false
     @State private var isNavigateToNotifications = false
@@ -32,16 +41,34 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(spacing: 12) {
                         
-                        Image(ProfileViewImages.userPhoto)
-                            .resizable()
-                            .scaledToFill()
+                        if let avatarURL = viewModel.avatarURL,
+                           let url = URL(string: avatarURL) {
+
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+
+                            } placeholder: {
+
+                                ProgressView()
+                            }
                             .frame(width: 100, height: 100)
                             .clipShape(Circle())
+
+                        } else {
+
+                            Image(ProfileViewImages.userPhoto)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipShape(Circle())
+                        }
                         
-                        Text("\(storage.currentUser?.firstName ?? "") \(storage.currentUser?.lastName ?? "")")
+                        Text(viewModel.fullName)
                             .font(.system(size: 22, weight: .bold))
-                        
-                        Text(storage.currentUser?.email ?? "")
+
+                        Text(viewModel.email)
                             .font(.system(size: 14))
                             .foregroundColor(.gray)
                     }
@@ -59,7 +86,7 @@ struct ProfileView: View {
                         
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
-                                ForEach(storage.pets) { pet in
+                                ForEach(viewModel.pets) { pet in
                                     PetCardLocal(pet: pet)
                                 }
                             }
@@ -102,12 +129,17 @@ struct ProfileView: View {
             }
         }
         .navigationDestination(isPresented: $isEditingProfile) {
-            ProfileViewEditing()
+            ProfileViewEditing(viewModel: viewModel)
         }
         .navigationDestination(isPresented: $isNavigateToNotifications) {
             NotificationSettingsView()
         }
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+        .onAppear {
+            Task {
+                await viewModel.loadProfile()
+            }
+        }
     }
 }
 
@@ -208,29 +240,92 @@ struct MenuRow: View {
 }
 
 struct PetCardLocal: View {
-    
-    let pet: LocalPet
-    
+
+    let pet: ProfilePetUIModel
+
     var body: some View {
-        VStack(spacing: 8) {
-            
-            if let uiImage = pet.image {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(12)
-            } else {
-                Image("PetPhotoPlaceholder")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 100, height: 100)
-                    .cornerRadius(12)
+
+        VStack(spacing: 10) {
+
+            Group {
+
+                if let imageURL = pet.imageURL,
+                   let url = URL(string: imageURL) {
+
+                    AsyncImage(url: url) { phase in
+
+                        switch phase {
+
+                        case .success(let image):
+
+                            image
+                                .resizable()
+                                .scaledToFill()
+
+                        case .failure(_):
+
+                            Image("PetPhotoPlaceholder")
+                                .resizable()
+                                .scaledToFill()
+
+                        case .empty:
+
+                            ZStack {
+
+                                Color.gray.opacity(0.08)
+
+                                ProgressView()
+                            }
+
+                        @unknown default:
+
+                            Image("PetPhotoPlaceholder")
+                                .resizable()
+                                .scaledToFill()
+                        }
+
+                    }
+
+                } else {
+
+                    Image("PetPhotoPlaceholder")
+                        .resizable()
+                        .scaledToFill()
+                }
             }
-            
-            Text(pet.name)
-            Text(pet.type)
-                .foregroundColor(.gray)
+            .frame(width: 100, height: 100)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+
+            VStack(spacing: 4) {
+
+                Text(pet.name)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.black)
+                    .lineLimit(1)
+
+                Text(pet.species)
+                    .font(.system(size: 12))
+                    .foregroundColor(.gray)
+
+                if !pet.breed.isEmpty {
+
+                    Text(pet.breed)
+                        .font(.system(size: 11))
+                        .foregroundColor(Color(hex: "#4A37A7"))
+                        .lineLimit(1)
+                }
+            }
         }
+        .frame(width: 124)
+        .padding(12)
+        .background(Color.white)
+        .cornerRadius(18)
+        .shadow(
+            color: .black.opacity(0.04),
+            radius: 6,
+            x: 0,
+            y: 2
+        )
     }
 }
+

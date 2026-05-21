@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BookingView: View {
+    let clinic: ClinicDTO
     @StateObject private var viewModel = BookingViewModel()
     
     var body: some View {
@@ -31,56 +32,115 @@ struct BookingView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
                     
+                    // Блок дат — без изменений
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text(BookingViewString.selectDateTitle).font(.system(size: 18, weight: .bold))
+                            Text(BookingViewString.selectDateTitle)
+                                .font(.system(size: 18, weight: .bold))
                             Spacer()
-                            Text("Март 2024").foregroundColor(Color(hex: "#4A37A7")).font(.system(size: 14))
+                            Text(clinic.name)
+                                .foregroundColor(Color(hex: "#4A37A7"))
+                                .font(.system(size: 14))
                         }
-                        
                         HStack(spacing: 12) {
-                            ForEach(viewModel.days, id: \.1) { day, date in
-                                DateCard(day: day, date: date, isSelected: viewModel.selectedDate == date) {
-                                    viewModel.selectedDate = date
+                            ForEach(viewModel.days, id: \.1) { day, apiDate in
+                                DateCard(
+                                    day: day,
+                                    date: String(apiDate.suffix(2)),
+                                    isSelected: viewModel.selectedDate == apiDate
+                                ) {
+                                    viewModel.selectedDate = apiDate
+                                }
+                            }
+                        }
+                    }
+
+                    // Блок слотов — реальные данные
+                    if viewModel.slots.isEmpty {
+                        Text("Нет доступных слотов")
+                            .font(.system(size: 14))
+                            .foregroundColor(.gray)
+                    } else {
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ],
+                            spacing: 12
+                        ) {
+                            ForEach(viewModel.slots) { slot in
+                                TimeSlotCard(
+                                    time: slot.start_time,
+                                    isSelected: viewModel.selectedSlotId == slot.id
+                                ) {
+                                    viewModel.selectedSlotId = slot.id
+                                    viewModel.selectedTime = slot.start_time
                                 }
                             }
                         }
                     }
                     
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        ForEach(viewModel.timeSlots, id: \.self) { time in
-                            TimeSlotCard(time: time, isSelected: viewModel.selectedTime == time) {
-                                viewModel.selectedTime = time
-                            }
-                        }
-                    }
-                    
+                    // Блок питомцев — без изменений
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(BookingViewString.selectPetTitle).font(.system(size: 18, weight: .bold))
-                        
-                        ForEach(viewModel.pets) { pet in
-                            PetSelectionRow(pet: pet, isSelected: viewModel.selectedPetId == pet.id) {
-                                viewModel.selectedPetId = pet.id
+                        HStack {
+                            Text(BookingViewString.selectPetTitle)
+                                .font(.system(size: 18, weight: .bold))
+                            Spacer()
+                            if let selectedPetId = viewModel.selectedPetId,
+                               let selectedPet = viewModel.pets.first(where: { $0.id == selectedPetId }) {
+                                Text(selectedPet.name)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(Color(hex: "#4A37A7"))
                             }
                         }
-                        
-                        Button(action: {}) {
-                            HStack {
-                                Image(systemName: "plus.circle")
-                                Text(BookingViewString.addPetAction)
+
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 168)
+
+                        } else if viewModel.pets.isEmpty {
+                            Button(action: {}) {
+                                HStack {
+                                    Image(systemName: "plus.circle")
+                                    Text(BookingViewString.addPetAction)
+                                }
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(Color(hex: "#4A37A7"))
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color(hex: "#4A37A7"), style: StrokeStyle(lineWidth: 1, dash: [5]))
+                                )
                             }
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(Color(hex: "#4A37A7"))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 12).stroke(Color(hex: "#4A37A7"), style: StrokeStyle(lineWidth: 1, dash: [5])))
+
+                        } else {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(viewModel.pets) { pet in
+                                        BookingPetCardLocal(
+                                            pet: pet,
+                                            isSelected: viewModel.selectedPetId == pet.id
+                                        ) {
+                                            viewModel.selectedPetId = pet.id
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 30)
+                                .frame(height: 200)
+                            }
+                            .padding(.horizontal, -16)
                         }
                     }
-                    
-                    // 4. Комментарий
+
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(BookingViewString.commentTitle).font(.system(size: 18, weight: .bold))
-                        Text("Что беспокоит вашего питомца?").font(.system(size: 13)).foregroundColor(.gray)
+                        Text(BookingViewString.commentTitle)
+                            .font(.system(size: 18, weight: .bold))
+                        Text("Что беспокоит вашего питомца?")
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
                         
                         TextEditor(text: $viewModel.comment)
                             .frame(height: 100)
@@ -92,7 +152,21 @@ struct BookingView: View {
                     
                     VStack(spacing: 12) {
                         PrimaryButton(title: BookingViewString.confirmBooking, isSecondary: false) {
-                            
+                            Task {
+                                await viewModel.confirmBooking(clinicId: clinic.id)
+                            }
+                        }
+
+                        if let successMessage = viewModel.successMessage {
+                            Text(successMessage)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.green)
+                        }
+
+                        if let errorMessage = viewModel.errorMessage {
+                            Text(errorMessage)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.red)
                         }
                         
                         Text(BookingViewString.bookingTerms)
@@ -107,6 +181,9 @@ struct BookingView: View {
             }
         }
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+        .task {
+            await viewModel.loadData(clinicId: clinic.id) // один вызов вместо трёх
+        }
     }
 }
 
@@ -150,38 +227,103 @@ struct TimeSlotCard: View {
     }
 }
 
-struct PetSelectionRow: View {
-    let pet: PetMock
+struct BookingPetCardLocal: View {
+
+    let pet: BookingPetUIModel
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
+
         Button(action: action) {
-            HStack(spacing: 16) {
-                Image(pet.imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 60, height: 60)
-                    .clipShape(Circle())
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(pet.name).font(.system(size: 16, weight: .bold))
-                    Text(pet.breed).font(.system(size: 13)).foregroundColor(.gray)
-                    Text("3 года").font(.system(size: 12)).foregroundColor(.gray)
+            VStack(spacing: 10) {
+
+                Group {
+
+                    if let imageURL = pet.imageURL,
+                       let url = URL(string: imageURL) {
+
+                        AsyncImage(url: url) { phase in
+
+                            switch phase {
+
+                            case .success(let image):
+
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+
+                            case .failure(_):
+
+                                Image("PetPhotoPlaceholder")
+                                    .resizable()
+                                    .scaledToFill()
+
+                            case .empty:
+
+                                ZStack {
+
+                                    Color.gray.opacity(0.08)
+
+                                    ProgressView()
+                                }
+
+                            @unknown default:
+
+                                Image("PetPhotoPlaceholder")
+                                    .resizable()
+                                    .scaledToFill()
+                            }
+
+                        }
+
+                    } else {
+
+                        Image("PetPhotoPlaceholder")
+                            .resizable()
+                            .scaledToFill()
+                    }
                 }
-                
-                Spacer()
-                
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? Color(hex: "#4A37A7") : Color(hex: "#E0E0E0"))
-                    .font(.system(size: 24))
+                .frame(width: 100, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                VStack(spacing: 4) {
+
+                    Text(pet.name)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.black)
+                        .lineLimit(1)
+
+                    Text(pet.species)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+
+                    if !pet.breed.isEmpty {
+
+                        Text(pet.breed)
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(hex: "#4A37A7"))
+                            .lineLimit(1)
+                    }
+                }
             }
-            .padding()
+            .frame(width: 124)
+            .padding(12)
             .background(Color.white)
-            .cornerRadius(16)
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(isSelected ? Color(hex: "#4A37A7") : Color.clear, lineWidth: 2))
+            .cornerRadius(18)
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(isSelected ? Color(hex: "#4A37A7") : Color.clear, lineWidth: 2)
+            )
+            .shadow(
+                color: .black.opacity(0.04),
+                radius: 6,
+                x: 0,
+                y: 2
+            )
         }
         .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle())
     }
 }
 

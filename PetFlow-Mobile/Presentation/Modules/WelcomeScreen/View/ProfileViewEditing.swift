@@ -9,7 +9,7 @@ import Combine
 import PhotosUI
 
 struct ProfileViewEditing: View {
-    @StateObject private var viewModel = ProfileViewModel()
+    @ObservedObject var viewModel: ProfileViewModel
     @Environment(\.dismiss) var dismiss
     
     @State private var selectedItem: PhotosPickerItem?
@@ -35,23 +35,55 @@ struct ProfileViewEditing: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     ZStack {
-                        Image(ProfileViewImages.userPhoto)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 120, height: 120)
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .fill(Color.black.opacity(0.4))
-                            )
-                        
-                        PhotosPicker(selection: $selectedItem, matching: .images) {
+
+                        if let avatarImage = viewModel.avatarImage {
+
+                            Image(uiImage: avatarImage)
+                                .resizable()
+                                .scaledToFill()
+
+                        } else if let avatarURL = viewModel.avatarURL,
+                                  let url = URL(string: avatarURL) {
+
+                            AsyncImage(url: url) { image in
+
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+
+                            } placeholder: {
+
+                                ProgressView()
+                            }
+
+                        } else {
+
+                            Image(ProfileViewImages.userPhoto)
+                                .resizable()
+                                .scaledToFill()
+                        }
+
+                        PhotosPicker(
+                            selection: $selectedItem,
+                            matching: .images
+                        ) {
+
                             Circle()
                                 .fill(Color(hex: "#4A37A7"))
-                                .frame(width: 44, height: 44)
-                                .overlay(Image(systemName: AddPetViewImages.cameraIcon).foregroundColor(.white))
+                                .frame(width: 42, height: 42)
+                                .overlay {
+
+                                    Image(systemName: AddPetViewImages.cameraIcon)
+                                        .foregroundColor(.white)
+                                }
                         }
+                        .offset(x: 40, y: 40)
                     }
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .padding(.top, 20)
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
                     .padding(.top, 20)
                     
                     VStack(spacing: 16) {
@@ -64,8 +96,13 @@ struct ProfileViewEditing: View {
                     
                     VStack(spacing: 12) {
                         PrimaryButton(title: ProfileViewString.saveChanges, isSecondary: false) {
-                            //viewModel.saveChanges()
-                            dismiss()
+
+                            Task {
+
+                                await viewModel.saveChanges()
+
+                                dismiss()
+                            }
                         }
                         
                         Button(action: { viewModel.deleteAccount() }) {
@@ -85,5 +122,22 @@ struct ProfileViewEditing: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+        .onChange(of: selectedItem) { newValue, _ in
+            Task {
+                if let data = try? await newValue?.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    viewModel.avatarImage = uiImage
+                }
+            }
+        }
+        .onAppear {
+
+            if viewModel.firstName.isEmpty {
+
+                Task {
+                    await viewModel.loadProfile()
+                }
+            }
+        }
     }
 }

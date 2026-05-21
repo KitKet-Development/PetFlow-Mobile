@@ -64,7 +64,10 @@ struct AddPetView: View {
                             Circle()
                                 .fill(Color(hex: "#4A37A7"))
                                 .frame(width: 44, height: 44)
-                                .overlay(Image(systemName: AddPetViewImages.cameraIcon).foregroundColor(.white))
+                                .overlay(
+                                    Image(systemName: AddPetViewImages.cameraIcon)
+                                        .foregroundColor(.white)
+                                )
                         }
                         .padding(12)
                     }
@@ -90,25 +93,26 @@ struct AddPetView: View {
                             text: $viewModel.petName
                         )
 
+                        // ← один DropdownField с onChange
                         DropdownField(
                             label: AddPetViewStrings.petTypeLabel,
                             placeholder: AddPetViewStrings.petTypePlaceholder,
                             selection: $viewModel.petType,
                             options: viewModel.petTypes
                         )
+                        .onChange(of: viewModel.petType) { _, newValue in
+                            viewModel.onSpeciesSelected(newValue)
+                        }
                     }
 
                     VStack(spacing: 16) {
                         PrimaryButton(
                             title: viewModel.isLoading
-                            ? "Загрузка..."
-                            : AddPetViewStrings.continueButton,
+                                ? "Загрузка..."
+                                : AddPetViewStrings.continueButton,
                             isSecondary: false
                         ) {
-
-                            viewModel.onContinueTap(
-                                image: petUIImage
-                            )
+                            viewModel.onContinueTap(image: petUIImage)
                         }
                         .disabled(viewModel.isLoading)
                         .onChange(of: viewModel.success) { _, success in
@@ -116,6 +120,7 @@ struct AddPetView: View {
                                 isRegistrationFinished = true
                             }
                         }
+
                         Button(action: {
                             viewModel.onAddLaterTap()
                             isRegistrationFinished = true
@@ -137,6 +142,9 @@ struct AddPetView: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
+        .task {
+            await viewModel.loadMeta()
+        }
         .alert(
             "Ошибка",
             isPresented: Binding(

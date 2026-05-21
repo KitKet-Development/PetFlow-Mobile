@@ -12,17 +12,18 @@ final class PetRepository: PetRepositoryProtocol {
     private let client = APIClient.shared
 
     func getPets() async throws -> [PetDTO] {
-
-        try await client.request(
-            endpoint: "\(APIConfig.shared.baseURL)/pets/",
+        let response: PaginatedResponse<PetDTO> = try await client.request(
+            endpoint: APIConfig.shared.petsURL,
+            method: "GET",
+            body: nil,
             requiresAuth: true
         )
+        return response.results
     }
 
     func createPet(request: CreatePetRequestDTO) async throws {
-
-        let _: PetDTO = try await client.request(
-            endpoint: "\(APIConfig.shared.baseURL)/pets/",
+        let _: PetWriteResponseDTO = try await client.request(
+            endpoint: APIConfig.shared.petsURL,
             method: "POST",
             body: request,
             requiresAuth: true

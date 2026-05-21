@@ -23,7 +23,7 @@ struct MainTabView: View {
                 case .pets:
                     PetDetailView()
                 case .bookings:
-                    BookingView()
+                    UserAppointmentsView()
                 case .profile:
                     ProfileView()
                 }
