@@ -8,21 +8,21 @@
 import Foundation
 
 final class ClinicRepository: ClinicRepositoryProtocol {
-
+    
     private let client: APIClientProtocol
-
+    
     init(client: APIClientProtocol = APIClient.shared) {
         self.client = client
     }
-
+    
     func getClinics(filters: ClinicFilterParams = ClinicFilterParams()) async throws -> [ClinicDTO] {
-
+        
         var components = URLComponents(
             string: "\(APIConfig.shared.baseURL)/clinics/"
         )!
-
+        
         var queryItems: [URLQueryItem] = []
-
+        
         if let minRating = filters.minRating {
             queryItems.append(URLQueryItem(name: "min_rating", value: "\(minRating)"))
         }
@@ -35,20 +35,20 @@ final class ClinicRepository: ClinicRepositoryProtocol {
         if let search = filters.search {
             queryItems.append(URLQueryItem(name: "search", value: search))
         }
-
+        
         if !queryItems.isEmpty {
             components.queryItems = queryItems
         }
-
+        
         let endpoint = components.url?.absoluteString ?? "\(APIConfig.shared.baseURL)/clinics/"
-
+        
         let response: PaginatedResponse<ClinicDTO> = try await client.request(
             endpoint: endpoint,
             method: "GET",
             body: nil,
             requiresAuth: false
         )
-
+        
         return response.results
     }
     

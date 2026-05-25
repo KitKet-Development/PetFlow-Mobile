@@ -6,7 +6,7 @@
 //
 
 struct CreatePetRequestDTO: Encodable {
-
+    
     let name: String
     let species: Int
     let breed: Int?

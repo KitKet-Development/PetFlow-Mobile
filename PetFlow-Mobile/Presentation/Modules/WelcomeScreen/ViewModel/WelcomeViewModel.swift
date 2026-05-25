@@ -10,19 +10,19 @@ import Combine
 
 @MainActor
 final class WelcomeViewModel: ObservableObject {
-
+    
     @Published var isAuthorized = false
     @Published var isLoading = false
-
+    
     private let tokenStorage: TokenStorageProtocol
-
+    
     init(
         tokenStorage: TokenStorageProtocol
     ) {
         self.tokenStorage = tokenStorage
         checkAuth()
     }
-
+    
     func checkAuth() {
         isAuthorized = tokenStorage.accessToken != nil
     }

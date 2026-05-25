@@ -13,13 +13,13 @@ protocol BookingRepositoryProtocol {
 }
 
 final class BookingRepository: BookingRepositoryProtocol {
-
+    
     private let apiClient: APIClientProtocol
-
+    
     init(apiClient: APIClientProtocol) {
         self.apiClient = apiClient
     }
-
+    
     func createBooking(clinicId: Int, dto: AppointmentWriteDTO) async throws {
         let _: AppointmentReadDTO = try await apiClient.request(
             endpoint: "\(APIConfig.shared.baseURL)/clinics/\(clinicId)/appointments/",
@@ -28,7 +28,7 @@ final class BookingRepository: BookingRepositoryProtocol {
             requiresAuth: true
         )
     }
-
+    
     func getUserAppointments() async throws -> [AppointmentReadDTO] {
         let response: PaginatedResponse<AppointmentReadDTO> = try await apiClient.request(
             endpoint: "\(APIConfig.shared.baseURL)/users/me/appointments/",
@@ -36,7 +36,7 @@ final class BookingRepository: BookingRepositoryProtocol {
             body: nil,
             requiresAuth: true
         )
-
+        
         return response.results
     }
 }

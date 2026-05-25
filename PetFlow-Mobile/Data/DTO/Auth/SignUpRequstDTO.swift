@@ -14,8 +14,3 @@ struct SignUpRequestDTO: Encodable {
     let password: String
 }
 
-struct SignUpResponseDTO: Decodable {
-    let email: String
-    let first_name: String
-    let last_name: String
-}

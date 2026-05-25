@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UpdateUserDTO {
-
+    
     let first_name: String
     let last_name: String
     let email: String

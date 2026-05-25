@@ -8,7 +8,7 @@
 import Foundation
 
 enum APIError: LocalizedError {
-
+    
     case invalidURL
     case invalidResponse
     case unauthorized
@@ -16,27 +16,27 @@ enum APIError: LocalizedError {
     case decodingError
     case serverError(String)
     case unknown
-
+    
     var errorDescription: String? {
         switch self {
         case .invalidURL:
             return "Некорректный URL"
-
+            
         case .invalidResponse:
             return "Некорректный ответ сервера"
-
+            
         case .unauthorized:
             return "Ошибка авторизации"
-
+            
         case .forbidden:
             return "Доступ запрещен"
-
+            
         case .decodingError:
             return "Ошибка обработки данных"
-
+            
         case .serverError(let message):
             return message
-
+            
         case .unknown:
             return "Неизвестная ошибка"
         }

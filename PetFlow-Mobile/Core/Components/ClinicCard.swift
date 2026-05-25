@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ClinicCard: View {
-
+    
     let clinic: ClinicDTO
     let onBook: () -> Void
-
+    
     var body: some View {
-
+        
         VStack(alignment: .leading, spacing: 0) {
-
+            
             AsyncImage(url: URL(string: clinic.logo ?? "")) { phase in
                 switch phase {
                 case .success(let image):
@@ -33,42 +33,42 @@ struct ClinicCard: View {
             .allowsHitTesting(false)
             
             VStack(alignment: .leading, spacing: 12) {
-
+                
                 HStack(alignment: .top) {
-
+                    
                     Text(clinic.name)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.primary)
                         .fixedSize(horizontal: false, vertical: true)
-
+                    
                     Spacer()
-
+                    
                     if let rating = clinic.rating {
                         Text("★ \(rating, specifier: "%.1f")")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(Color(hex: "#4A37A7"))
                     }
                 }
-
+                
                 if let description = clinic.description {
                     Text(description)
                         .font(.system(size: 14))
                         .foregroundColor(.secondary)
                         .lineLimit(3)
                 }
-
+                
                 if let address = clinic.address?.full_address {
                     Label(address, systemImage: "mappin.and.ellipse")
                         .font(.system(size: 13))
                         .foregroundColor(.secondary)
                 }
-
+                
                 if let phone = clinic.phone {
                     Label(phone, systemImage: "phone")
                         .font(.system(size: 13))
                         .foregroundColor(.secondary)
                 }
-
+                
                 PrimaryButton(
                     title: "Записаться",
                     isSecondary: false,
@@ -87,8 +87,6 @@ struct ClinicCard: View {
             y: 5
         )
     }
-
-    // MARK: - Placeholder
     private var placeholder: some View {
         Rectangle()
             .fill(Color(hex: "#E8E3FF"))

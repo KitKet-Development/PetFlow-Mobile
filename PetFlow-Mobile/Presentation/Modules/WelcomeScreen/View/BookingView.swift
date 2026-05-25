@@ -28,7 +28,7 @@ struct BookingView: View {
             
             BookingStepIndicator(currentStep: 1)
                 .padding(.vertical, 10)
-
+            
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
                     
@@ -54,7 +54,7 @@ struct BookingView: View {
                             }
                         }
                     }
-
+                    
                     // Блок слотов — реальные данные
                     if viewModel.slots.isEmpty {
                         Text("Нет доступных слотов")
@@ -94,12 +94,12 @@ struct BookingView: View {
                                     .foregroundColor(Color(hex: "#4A37A7"))
                             }
                         }
-
+                        
                         if viewModel.isLoading {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 168)
-
+                            
                         } else if viewModel.pets.isEmpty {
                             Button(action: {}) {
                                 HStack {
@@ -115,7 +115,7 @@ struct BookingView: View {
                                         .stroke(Color(hex: "#4A37A7"), style: StrokeStyle(lineWidth: 1, dash: [5]))
                                 )
                             }
-
+                            
                         } else {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
@@ -134,7 +134,7 @@ struct BookingView: View {
                             .padding(.horizontal, -16)
                         }
                     }
-
+                    
                     VStack(alignment: .leading, spacing: 12) {
                         Text(BookingViewString.commentTitle)
                             .font(.system(size: 18, weight: .bold))
@@ -156,13 +156,13 @@ struct BookingView: View {
                                 await viewModel.confirmBooking(clinicId: clinic.id)
                             }
                         }
-
+                        
                         if let successMessage = viewModel.successMessage {
                             Text(successMessage)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.green)
                         }
-
+                        
                         if let errorMessage = viewModel.errorMessage {
                             Text(errorMessage)
                                 .font(.system(size: 13, weight: .medium))
@@ -184,185 +184,5 @@ struct BookingView: View {
         .task {
             await viewModel.loadData(clinicId: clinic.id) // один вызов вместо трёх
         }
-    }
-}
-
-struct DateCard: View {
-    let day: String
-    let date: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Text(day).font(.system(size: 12))
-                Text(date).font(.system(size: 18, weight: .bold))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(isSelected ? Color(hex: "#4A37A7") : Color.white)
-            .foregroundColor(isSelected ? .white : .black)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.05), radius: 5)
-        }
-    }
-}
-
-struct TimeSlotCard: View {
-    let time: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(time)
-                .font(.system(size: 14, weight: .medium))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(isSelected ? Color(hex: "#4A37A7") : Color.white)
-                .foregroundColor(isSelected ? .white : .black)
-                .cornerRadius(10)
-        }
-    }
-}
-
-struct BookingPetCardLocal: View {
-
-    let pet: BookingPetUIModel
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-
-        Button(action: action) {
-            VStack(spacing: 10) {
-
-                Group {
-
-                    if let imageURL = pet.imageURL,
-                       let url = URL(string: imageURL) {
-
-                        AsyncImage(url: url) { phase in
-
-                            switch phase {
-
-                            case .success(let image):
-
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-
-                            case .failure(_):
-
-                                Image("PetPhotoPlaceholder")
-                                    .resizable()
-                                    .scaledToFill()
-
-                            case .empty:
-
-                                ZStack {
-
-                                    Color.gray.opacity(0.08)
-
-                                    ProgressView()
-                                }
-
-                            @unknown default:
-
-                                Image("PetPhotoPlaceholder")
-                                    .resizable()
-                                    .scaledToFill()
-                            }
-
-                        }
-
-                    } else {
-
-                        Image("PetPhotoPlaceholder")
-                            .resizable()
-                            .scaledToFill()
-                    }
-                }
-                .frame(width: 100, height: 100)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-
-                VStack(spacing: 4) {
-
-                    Text(pet.name)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.black)
-                        .lineLimit(1)
-
-                    Text(pet.species)
-                        .font(.system(size: 12))
-                        .foregroundColor(.gray)
-
-                    if !pet.breed.isEmpty {
-
-                        Text(pet.breed)
-                            .font(.system(size: 11))
-                            .foregroundColor(Color(hex: "#4A37A7"))
-                            .lineLimit(1)
-                    }
-                }
-            }
-            .frame(width: 124)
-            .padding(12)
-            .background(Color.white)
-            .cornerRadius(18)
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(isSelected ? Color(hex: "#4A37A7") : Color.clear, lineWidth: 2)
-            )
-            .shadow(
-                color: .black.opacity(0.04),
-                radius: 6,
-                x: 0,
-                y: 2
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-        .contentShape(Rectangle())
-    }
-}
-
-struct BookingStepIndicator: View {
-    let currentStep: Int
-    var body: some View {
-        HStack {
-            StepCircle(number: "1", title: "ВРЕМЯ", isActive: currentStep >= 1)
-            Line()
-            StepCircle(number: "2", title: "ПИТОМЕЦ", isActive: currentStep >= 2)
-            Line()
-            StepCircle(number: "3", title: "ИНФО", isActive: currentStep >= 3)
-        }
-        .padding(.horizontal, 30)
-    }
-    
-    @ViewBuilder
-    func StepCircle(number: String, title: String, isActive: Bool) -> some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill(isActive ? Color(hex: "#4A37A7") : Color(hex: "#E8EFFF"))
-                    .frame(width: 30, height: 30)
-                Text(number)
-                    .foregroundColor(isActive ? .white : .gray)
-                    .font(.system(size: 14, weight: .bold))
-            }
-            Text(title)
-                .font(.system(size: 10, weight: .bold))
-                .foregroundColor(isActive ? .black : .gray)
-        }
-    }
-    
-    @ViewBuilder
-    func Line() -> some View {
-        Rectangle()
-            .fill(Color(hex: "#E8EFFF"))
-            .frame(height: 2)
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 20)
     }
 }

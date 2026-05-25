@@ -6,13 +6,13 @@
 //
 
 final class GetSpeciesUseCase {
-
+    
     private let repository: PetMetaRepositoryProtocol
-
+    
     init(repository: PetMetaRepositoryProtocol) {
         self.repository = repository
     }
-
+    
     func execute() async throws -> [SpeciesDTO] {
         try await repository.getSpecies()
     }

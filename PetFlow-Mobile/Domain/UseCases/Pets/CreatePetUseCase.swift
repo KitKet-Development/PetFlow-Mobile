@@ -8,25 +8,25 @@
 import SwiftUI
 
 final class CreatePetUseCase {
-
+    
     private let repository: PetRepositoryProtocol
-
+    
     init(repository: PetRepositoryProtocol) {
         self.repository = repository
     }
-
+    
     func execute(
         name: String,
         speciesId: Int,
         image: UIImage? = nil
     ) async throws {
-
+        
         let request = CreatePetRequestDTO(
             name: name,
             species: speciesId,
             breed: nil
         )
-
+        
         try await repository.createPet(request: request)
     }
 }

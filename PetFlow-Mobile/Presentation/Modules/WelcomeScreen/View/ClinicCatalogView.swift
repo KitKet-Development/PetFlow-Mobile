@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ClinicCatalogView: View {
-
+    
     @State private var selectedBookingClinic: ClinicDTO?
     @StateObject private var viewModel = ClinicCatalogViewModel()
-
+    
     var body: some View {
-
+        
         VStack(spacing: 16) {
             headerView
             searchView
@@ -30,16 +30,16 @@ struct ClinicCatalogView: View {
 private extension ClinicCatalogView {
     
     var headerView: some View {
-
+        
         HStack {
-
+            
             Image(systemName: "chevron.left")
-
+            
             Text(WelcomeViewStrings.welcomeTitle)
                 .font(.system(size: 22, weight: .bold))
-
+            
             Spacer()
-
+            
             Image("UserAvatar")
                 .resizable()
                 .frame(width: 40, height: 40)
@@ -47,7 +47,7 @@ private extension ClinicCatalogView {
         }
         .padding(.horizontal)
     }
-
+    
     var searchView: some View {
         HStack {
             Image(systemName: ClinicCatalogViewImages.searchIcon)
@@ -63,7 +63,7 @@ private extension ClinicCatalogView {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(hex: "#E0E0E0")))
         .padding(.horizontal)
     }
-
+    
     var filtersView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -81,7 +81,7 @@ private extension ClinicCatalogView {
             .padding(.horizontal)
         }
     }
-
+    
     @ViewBuilder
     var contentView: some View {
         if viewModel.isLoading {

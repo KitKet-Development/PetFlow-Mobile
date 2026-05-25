@@ -8,17 +8,17 @@
 import Foundation
 
 final class APIConfig {
-
+    
     static let shared = APIConfig()
-
+    
     private init() {}
-
+    
     let baseURL = "http://192.168.1.58:8000/api/v1"
-
+    
     var authBaseURL: String {
         "\(baseURL)/auth"
     }
-
+    
     func profileURL(userID: Int) -> String {
         "\(baseURL)/users/\(userID)/"
     }
@@ -26,12 +26,12 @@ final class APIConfig {
     var breedsURL: String {
         "\(baseURL)/breeds/"
     }
-
+    
     var speciesURL: String {
         "\(baseURL)/species/"
     }
     
     var petsURL: String {
-            "\(baseURL)/pets/"
-        }
+        "\(baseURL)/pets/"
+    }
 }

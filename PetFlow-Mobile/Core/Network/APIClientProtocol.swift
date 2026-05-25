@@ -7,7 +7,7 @@
 import Foundation
 
 protocol APIClientProtocol {
-
+    
     func request<T: Decodable>(
         endpoint: String,
         method: String,

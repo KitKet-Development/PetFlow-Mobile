@@ -11,14 +11,13 @@ struct WelcomeView: View {
     @StateObject private var viewModel = WelcomeViewModel(tokenStorage: TokenStorage.shared)
     @State private var showRegistration = false
     @State private var showLogin = false
-
+    
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
                 ZStack {
                     Color(hex: "#EDE8F5").ignoresSafeArea()
-
-                    // Верхняя волна
+                    
                     VStack {
                         WaveTopShape()
                             .fill(Color(hex: "#C9BFF0"))
@@ -26,8 +25,7 @@ struct WelcomeView: View {
                         Spacer()
                     }
                     .ignoresSafeArea()
-
-                    // Нижняя волна
+                    
                     VStack {
                         Spacer()
                         WaveBottomShape()
@@ -35,26 +33,22 @@ struct WelcomeView: View {
                             .frame(height: geometry.size.height * 0.32)
                     }
                     .ignoresSafeArea()
-
-                    // Основной контент
+                    
                     VStack(spacing: 0) {
                         Spacer()
-
-                        // Лого + название
+                        
                         VStack(spacing: 14) {
                             Image(WelcomeViewImages.logo)
                                 .resizable()
                                 .frame(width: 80, height: 80)
                                 .cornerRadius(20)
-
+                            
                             Text(WelcomeViewStrings.welcomeTitle)
                                 .font(.system(size: 36, weight: .bold))
                                 .foregroundColor(Color(hex: "#1A1A1A"))
                         }
                         .offset(y: -geometry.size.height * 0.1)
-
-
-                        // Кнопки + соглашение
+                        
                         VStack(spacing: 14) {
                             PrimaryButton(
                                 title: WelcomeViewStrings.registration,
@@ -62,14 +56,14 @@ struct WelcomeView: View {
                             ) {
                                 showRegistration = true
                             }
-
+                            
                             PrimaryButton(
                                 title: WelcomeViewStrings.login,
                                 isSecondary: true
                             ) {
                                 showLogin = true
                             }
-
+                            
                             Text(WelcomeViewStrings.termsAgreement)
                                 .font(.system(size: 13))
                                 .foregroundColor(.gray)
@@ -77,11 +71,10 @@ struct WelcomeView: View {
                                 .padding(.horizontal, 16)
                         }
                         .padding(.horizontal, 24)
-                        .offset(y: -geometry.size.height * 0.05) // ← чуть выше нижней части
-
+                        .offset(y: -geometry.size.height * 0.05)
+                        
                         Spacer()
-
-                        // Защита данных — самый низ
+                        
                         HStack(spacing: 8) {
                             Image(systemName: WelcomeViewImages.shieldIcon)
                             Text(WelcomeViewStrings.dataProtection)
@@ -103,7 +96,6 @@ struct WelcomeView: View {
     }
 }
 
-// Верхняя волна — выпуклая вниз
 struct WaveTopShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -120,7 +112,6 @@ struct WaveTopShape: Shape {
     }
 }
 
-// Нижняя волна — вогнутая вверх
 struct WaveBottomShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()

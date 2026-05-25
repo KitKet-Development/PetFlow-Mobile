@@ -29,7 +29,7 @@ struct PetDetailView: View {
                     .clipShape(Circle())
             }
             .padding()
-
+            
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 0) {
@@ -62,7 +62,7 @@ struct PetDetailView: View {
                     .background(Color.white)
                     .cornerRadius(20)
                     .shadow(color: .black.opacity(0.05), radius: 10)
-
+                    
                     VStack(alignment: .leading, spacing: 12) {
                         Label(PetDetailViewString.chronicDiseases, systemImage: PetDetailViewImages.diseaseIcon)
                             .font(.system(size: 18, weight: .bold))
@@ -79,7 +79,7 @@ struct PetDetailView: View {
                     .padding()
                     .background(Color.white)
                     .cornerRadius(20)
-
+                    
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Label(PetDetailViewString.vaccinations, systemImage: "ivfluid.bag.fill")
@@ -99,7 +99,7 @@ struct PetDetailView: View {
                     .padding()
                     .background(Color.white)
                     .cornerRadius(20)
-
+                    
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Label(PetDetailViewString.healthHistory, systemImage: PetDetailViewImages.historyIcon)

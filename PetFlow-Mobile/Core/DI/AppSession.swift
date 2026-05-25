@@ -11,15 +11,15 @@ import Combine
 
 @MainActor
 final class AppSession: ObservableObject {
-
+    
     static let shared = AppSession()
-
+    
     @Published var currentUser: LocalUser?
     @Published var pets: [LocalPet] = []
     @Published var isAuthorized = false
-
+    
     private init() {}
-
+    
     func logout() {
         currentUser = nil
         pets = []
@@ -38,7 +38,7 @@ struct LocalUser {
 
 struct LocalPet: Identifiable {
     let id = UUID()
-
+    
     var name: String
     var type: String
     var image: UIImage?
@@ -46,11 +46,11 @@ struct LocalPet: Identifiable {
 
 
 final class LocalStorageService: ObservableObject {
-
+    
     static let shared = LocalStorageService()
-
+    
     @Published var currentUser: LocalUser?
     @Published var pets: [LocalPet] = []
-
+    
     private init() {}
 }

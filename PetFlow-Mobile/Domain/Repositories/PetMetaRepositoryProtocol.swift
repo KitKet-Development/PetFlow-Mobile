@@ -6,8 +6,8 @@
 //
 
 protocol PetMetaRepositoryProtocol {
-
+    
     func getSpecies() async throws -> [SpeciesDTO]
-
+    
     func getBreeds() async throws -> [BreedDTO]
 }

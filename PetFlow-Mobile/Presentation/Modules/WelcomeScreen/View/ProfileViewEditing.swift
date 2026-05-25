@@ -35,44 +35,44 @@ struct ProfileViewEditing: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     ZStack {
-
+                        
                         if let avatarImage = viewModel.avatarImage {
-
+                            
                             Image(uiImage: avatarImage)
                                 .resizable()
                                 .scaledToFill()
-
+                            
                         } else if let avatarURL = viewModel.avatarURL,
                                   let url = URL(string: avatarURL) {
-
+                            
                             AsyncImage(url: url) { image in
-
+                                
                                 image
                                     .resizable()
                                     .scaledToFill()
-
+                                
                             } placeholder: {
-
+                                
                                 ProgressView()
                             }
-
+                            
                         } else {
-
+                            
                             Image(ProfileViewImages.userPhoto)
                                 .resizable()
                                 .scaledToFill()
                         }
-
+                        
                         PhotosPicker(
                             selection: $selectedItem,
                             matching: .images
                         ) {
-
+                            
                             Circle()
                                 .fill(Color(hex: "#4A37A7"))
                                 .frame(width: 42, height: 42)
                                 .overlay {
-
+                                    
                                     Image(systemName: AddPetViewImages.cameraIcon)
                                         .foregroundColor(.white)
                                 }
@@ -96,11 +96,11 @@ struct ProfileViewEditing: View {
                     
                     VStack(spacing: 12) {
                         PrimaryButton(title: ProfileViewString.saveChanges, isSecondary: false) {
-
+                            
                             Task {
-
+                                
                                 await viewModel.saveChanges()
-
+                                
                                 dismiss()
                             }
                         }
@@ -131,9 +131,9 @@ struct ProfileViewEditing: View {
             }
         }
         .onAppear {
-
+            
             if viewModel.firstName.isEmpty {
-
+                
                 Task {
                     await viewModel.loadProfile()
                 }

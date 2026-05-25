@@ -25,46 +25,46 @@ struct AppointmentCardUIModel: Identifiable {
 
 @MainActor
 final class BookingViewModel: ObservableObject {
-
+    
     @Published var selectedDate = ""
     @Published var selectedTime = ""
     @Published var selectedPetId: Int?
     @Published var selectedSlotId: Int?
     @Published var comment = ""
-
+    
     @Published var pets: [BookingPetUIModel] = []
     @Published var slots: [SlotDTO] = []       // ← вместо timeSlots
     @Published var appointments: [AppointmentCardUIModel] = []
-
+    
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var successMessage: String?
-
+    
     var days: [(String, String)] {
         let calendar = Calendar.current
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
-
+        
         return (0..<5).compactMap { index in
             guard let date = calendar.date(
                 byAdding: .day, value: index, to: Date()
             ) else { return nil }
-
+            
             formatter.dateFormat = "EE"
             let day = formatter.string(from: date).uppercased()
-
+            
             formatter.dateFormat = "yyyy-MM-dd"
             let apiDate = formatter.string(from: date)
-
+            
             return (day, apiDate)
         }
     }
-
+    
     private let bookingUseCase: CreateBookingUseCase
     private let getPetsUseCase: GetPetsUseCase
     private let getSlotsUseCase: GetSlotsUseCase
     private let getUserAppointmentsUseCase: GetUserAppointmentsUseCase
-
+    
     init(
         bookingUseCase: CreateBookingUseCase? = nil,
         getPetsUseCase: GetPetsUseCase? = nil,
@@ -72,15 +72,15 @@ final class BookingViewModel: ObservableObject {
         getUserAppointmentsUseCase: GetUserAppointmentsUseCase? = nil
     ) {
         self.bookingUseCase = bookingUseCase
-            ?? DependencyContainer.shared.createBookingUseCase
+        ?? DependencyContainer.shared.createBookingUseCase
         self.getPetsUseCase = getPetsUseCase
-            ?? DependencyContainer.shared.getPetsUseCase
+        ?? DependencyContainer.shared.getPetsUseCase
         self.getSlotsUseCase = getSlotsUseCase
-            ?? DependencyContainer.shared.getSlotsUseCase
+        ?? DependencyContainer.shared.getSlotsUseCase
         self.getUserAppointmentsUseCase = getUserAppointmentsUseCase
-            ?? DependencyContainer.shared.getUserAppointmentsUseCase
+        ?? DependencyContainer.shared.getUserAppointmentsUseCase
     }
-
+    
     func loadData(clinicId: Int) async {
         await withTaskGroup(of: Void.self) { group in
             group.addTask { await self.loadPets() }
@@ -88,11 +88,11 @@ final class BookingViewModel: ObservableObject {
             group.addTask { await self.loadAppointments() }
         }
     }
-
+    
     func loadPets() async {
         do {
             let dto = try await getPetsUseCase.execute()
-
+            
             pets = dto.map {
                 BookingPetUIModel(
                     id: $0.id,
@@ -102,34 +102,34 @@ final class BookingViewModel: ObservableObject {
                     imageURL: $0.avatar         // ← было photo
                 )
             }
-
+            
             if selectedPetId == nil {
                 selectedPetId = pets.first?.id
             }
-
+            
         } catch {
             errorMessage = error.localizedDescription
         }
     }
-
+    
     func loadSlots(clinicId: Int) async {
         do {
             slots = try await getSlotsUseCase.execute(clinicId: clinicId)
-
+            
             if selectedSlotId == nil {
                 selectedSlotId = slots.first?.id
                 selectedTime = slots.first?.start_time ?? ""
             }
-
+            
         } catch {
             errorMessage = error.localizedDescription
         }
     }
-
+    
     func loadAppointments() async {
         do {
             let items = try await getUserAppointmentsUseCase.execute()
-
+            
             appointments = items.map {
                 AppointmentCardUIModel(
                     id: $0.id,
@@ -138,11 +138,11 @@ final class BookingViewModel: ObservableObject {
                     status: mapStatus($0.status)
                 )
             }
-
+            
         } catch {
         }
     }
-
+    
     private func mapStatus(_ status: String?) -> String {
         switch status {
         case "pending":   return "Ожидает подтверждения"
@@ -152,41 +152,41 @@ final class BookingViewModel: ObservableObject {
         default:          return "Неизвестно"
         }
     }
-
+    
     func confirmBooking(clinicId: Int) async {
-
+        
         guard let selectedPetId else {
             errorMessage = "Выберите питомца"
             return
         }
-
+        
         guard let selectedSlotId else {
             errorMessage = "Выберите временной слот"
             return
         }
-
+        
         guard !selectedDate.isEmpty else {
             errorMessage = "Выберите дату"
             return
         }
-
+        
         do {
             isLoading = true
             errorMessage = nil
             successMessage = nil
-
+            
             let dto = AppointmentWriteDTO(
                 pet: selectedPetId,
                 date: selectedDate,
                 slot: selectedSlotId, // ← теперь реальный id слота
                 comment: comment.isEmpty ? nil : comment
             )
-
+            
             try await bookingUseCase.execute(clinicId: clinicId, dto: dto)
             successMessage = "Запись успешно создана"
             await loadAppointments()
             isLoading = false
-
+            
         } catch {
             isLoading = false
             errorMessage = error.localizedDescription

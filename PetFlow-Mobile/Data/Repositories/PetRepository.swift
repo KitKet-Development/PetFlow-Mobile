@@ -8,9 +8,9 @@
 import Foundation
 
 final class PetRepository: PetRepositoryProtocol {
-
+    
     private let client = APIClient.shared
-
+    
     func getPets() async throws -> [PetDTO] {
         let response: PaginatedResponse<PetDTO> = try await client.request(
             endpoint: APIConfig.shared.petsURL,
@@ -20,7 +20,7 @@ final class PetRepository: PetRepositoryProtocol {
         )
         return response.results
     }
-
+    
     func createPet(request: CreatePetRequestDTO) async throws {
         let _: PetWriteResponseDTO = try await client.request(
             endpoint: APIConfig.shared.petsURL,

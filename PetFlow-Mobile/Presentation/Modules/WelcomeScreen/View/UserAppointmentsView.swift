@@ -9,19 +9,19 @@ import SwiftUI
 
 struct UserAppointmentsView: View {
     @StateObject private var viewModel = BookingViewModel()
-
+    
     var body: some View {
         VStack(spacing: 16) {
             HStack {
                 Text("Мои записи")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(Color(hex: "#4A37A7"))
-
+                
                 Spacer()
             }
             .padding(.horizontal)
             .padding(.top)
-
+            
             if viewModel.isLoading {
                 Spacer()
                 ProgressView()
@@ -45,11 +45,11 @@ struct UserAppointmentsView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(appointment.title)
                                     .font(.system(size: 16, weight: .semibold))
-
+                                
                                 Text(appointment.subtitle)
                                     .font(.system(size: 14))
                                     .foregroundColor(.gray)
-
+                                
                                 Text(appointment.status)
                                     .font(.system(size: 12, weight: .medium))
                                     .foregroundColor(Color(hex: "#4A37A7"))

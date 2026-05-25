@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct FilterChip: View {
-
+    
     let title: String
     var icon: String? = nil
-
+    
     let isSelected: Bool
-
+    
     var body: some View {
-
+        
         HStack {
-
+            
             if let icon {
                 Image(systemName: icon)
             }
-
+            
             Text(title)
         }
         .padding(.horizontal, 16)

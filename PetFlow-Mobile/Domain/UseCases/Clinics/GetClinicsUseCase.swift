@@ -15,13 +15,13 @@ struct ClinicFilterParams {
 }
 
 final class GetClinicsUseCase {
-
+    
     private let repository: ClinicRepositoryProtocol
-
+    
     init(repository: ClinicRepositoryProtocol) {
         self.repository = repository
     }
-
+    
     func execute(filters: ClinicFilterParams = ClinicFilterParams()) async throws -> [ClinicDTO] {
         try await repository.getClinics(filters: filters)
     }

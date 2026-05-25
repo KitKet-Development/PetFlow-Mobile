@@ -6,7 +6,7 @@
 //
 
 struct ProfilePetDTO: Codable, Identifiable {
-
+    
     let id: Int
     let name: String
     let species: Int?
