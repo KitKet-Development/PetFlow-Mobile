@@ -5,10 +5,11 @@
 //  Created by Stepan Kolenkin on 25.05.2026.
 //
 
-struct AppointmentClinicDTO: Codable {
+struct AppointmentClinicDTO: Codable, Hashable {
+
     let id: Int
     let name: String
     let address: Int
     let phone: String?
-    let email: String
+    let email: String?
 }

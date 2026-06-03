@@ -7,11 +7,6 @@
 
 import Foundation
 
-protocol BookingRepositoryProtocol {
-    func createBooking(clinicId: Int, dto: AppointmentWriteDTO) async throws
-    func getUserAppointments() async throws -> [AppointmentReadDTO]
-}
-
 final class BookingRepository: BookingRepositoryProtocol {
     
     private let apiClient: APIClientProtocol

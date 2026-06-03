@@ -54,7 +54,7 @@ struct PetCardLocal: View {
                         
                     }
                     
-                } else {
+                }else {
                     
                     Image("PetPhotoPlaceholder")
                         .resizable()

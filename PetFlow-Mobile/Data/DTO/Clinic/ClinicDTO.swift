@@ -8,17 +8,14 @@
 import Foundation
 import Combine
 
-struct ClinicDTO: Codable, Identifiable, Hashable {
-    
+struct ClinicDTO: Codable, Identifiable, Hashable, Equatable {
     let id: Int
-    
     let name: String
     let phone: String?
     let email: String?
     let description: String?
-    
     let logo: String?
     let rating: Double?
-    
     let address: AddressDTO?
+    let species: [SpeciesDTO]?
 }

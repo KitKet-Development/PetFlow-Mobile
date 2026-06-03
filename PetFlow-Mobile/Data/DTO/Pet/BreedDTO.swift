@@ -6,13 +6,12 @@
 //
 
 struct BreedDTO: Codable, Identifiable {
-    
     let id: Int
     let name: String
     let species: SpeciesDTO
 }
 
-struct BreedReadSimpleDTO: Codable, Identifiable {
+struct BreedReadSimpleDTO: Codable, Identifiable, Hashable, Equatable {
     let id: Int
     let name: String
 }

@@ -8,7 +8,7 @@
 struct WelcomeViewImages {
     static let logo = "AppLogo"
     static let welcomeIllustration = "WelcomePets"
-    static let shieldIcon = "shield.checkmark"
+    static let shieldIcon = "shield"
 }
 
 struct RegistrationViewImages{

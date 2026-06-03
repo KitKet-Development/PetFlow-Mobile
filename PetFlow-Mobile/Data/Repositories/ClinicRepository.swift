@@ -61,4 +61,14 @@ final class ClinicRepository: ClinicRepositoryProtocol {
         )
         return response.results
     }
+    
+    func getVets(clinicId: Int) async throws -> [VetProfileReadDTO] {
+        let response: PaginatedResponse<VetProfileReadDTO> = try await client.request(
+            endpoint: "\(APIConfig.shared.baseURL)/clinics/\(clinicId)/vets/",
+            method: "GET",
+            body: nil,
+            requiresAuth: true
+        )
+        return response.results
+    }
 }

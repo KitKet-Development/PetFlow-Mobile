@@ -83,8 +83,14 @@ struct LoginView: View {
             Spacer()
         }
         .navigationDestination(isPresented: $viewModel.loginSuccess) {
-            MainTabView()
-                .navigationBarBackButtonHidden(true)
+            switch AppSession.shared.userRole {
+            case .owner:
+                OwnerMainTabView()
+                    .navigationBarBackButtonHidden(true)
+            case .user:
+                MainTabView()
+                    .navigationBarBackButtonHidden(true)
+            }
         }
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
         .navigationBarHidden(true)

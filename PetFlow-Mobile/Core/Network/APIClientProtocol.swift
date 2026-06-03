@@ -23,4 +23,10 @@ protocol APIClientProtocol {
         imageFieldName: String,
         requiresAuth: Bool
     ) async throws -> T
+    
+    func requestNoContent(
+        endpoint: String,
+        method: String,
+        requiresAuth: Bool
+    ) async throws
 }

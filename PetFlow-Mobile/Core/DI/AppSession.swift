@@ -6,51 +6,36 @@
 //
 
 import Foundation
-import SwiftUI
 import Combine
-
-@MainActor
+ 
 final class AppSession: ObservableObject {
-    
+ 
     static let shared = AppSession()
-    
-    @Published var currentUser: LocalUser?
-    @Published var pets: [LocalPet] = []
-    @Published var isAuthorized = false
-    
-    private init() {}
-    
-    func logout() {
-        currentUser = nil
-        pets = []
-        isAuthorized = false
+ 
+    @Published var isLoggedIn: Bool = false
+    @Published var userRole: UserRole = .user
+ 
+    private init() {
+        if let token = TokenStorage.shared.accessToken, !token.isEmpty {
+            isLoggedIn = true
+            let roleRaw = UserDefaults.standard.string(forKey: "user_role") ?? "user"
+            userRole = UserRole(rawValue: roleRaw) ?? .user
+        }
     }
-}
-
-struct LocalUser {
-    var firstName: String
-    var lastName: String
-    var email: String
-    var password: String
-    var phone: String = ""
-    var avatar: UIImage?
-}
-
-struct LocalPet: Identifiable {
-    let id = UUID()
-    
-    var name: String
-    var type: String
-    var image: UIImage?
-}
-
-
-final class LocalStorageService: ObservableObject {
-    
-    static let shared = LocalStorageService()
-    
-    @Published var currentUser: LocalUser?
-    @Published var pets: [LocalPet] = []
-    
-    private init() {}
+ 
+    func login(role: String) {
+        let resolvedRole = UserRole(rawValue: role) ?? .user
+        userRole = resolvedRole
+        UserDefaults.standard.set(role, forKey: "user_role")
+        isLoggedIn = true
+    }
+ 
+    func logout() {
+        isLoggedIn = false
+        userRole = .user
+        UserDefaults.standard.removeObject(forKey: "user_role")
+        UserDefaults.standard.removeObject(forKey: "current_user_id")
+        TokenStorage.shared.clear()
+        DependencyContainer.reset()
+    }
 }

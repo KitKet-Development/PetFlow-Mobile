@@ -7,13 +7,14 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct ClinicCatalogView: View {
     
-    @State private var selectedBookingClinic: ClinicDTO?
+    @State private var selectedClinic: ClinicDTO?
     @StateObject private var viewModel = ClinicCatalogViewModel()
     
     var body: some View {
-        
         VStack(spacing: 16) {
             headerView
             searchView
@@ -30,16 +31,10 @@ struct ClinicCatalogView: View {
 private extension ClinicCatalogView {
     
     var headerView: some View {
-        
         HStack {
-            
-            Image(systemName: "chevron.left")
-            
             Text(WelcomeViewStrings.welcomeTitle)
                 .font(.system(size: 22, weight: .bold))
-            
             Spacer()
-            
             Image("UserAvatar")
                 .resizable()
                 .frame(width: 40, height: 40)
@@ -54,7 +49,7 @@ private extension ClinicCatalogView {
                 .foregroundColor(.gray)
             TextField(
                 ClinicCatalogViewString.searchPlaceholder,
-                text: $viewModel.searchText // ← биндинг на viewModel
+                text: $viewModel.searchText
             )
         }
         .padding()
@@ -74,7 +69,7 @@ private extension ClinicCatalogView {
                         isSelected: viewModel.selectedFilter == title
                     )
                     .onTapGesture {
-                        viewModel.selectFilter(title) // ← серверный запрос
+                        viewModel.selectFilter(title)
                     }
                 }
             }
@@ -97,15 +92,15 @@ private extension ClinicCatalogView {
                 VStack(spacing: 20) {
                     ForEach(viewModel.clinics) { clinic in
                         ClinicCard(clinic: clinic) {
-                            selectedBookingClinic = clinic
+                            selectedClinic = clinic
                         }
                         .buttonStyle(.plain)
                     }
                 }
                 .padding()
             }
-            .navigationDestination(item: $selectedBookingClinic) { clinic in
-                BookingView(clinic: clinic)
+            .navigationDestination(item: $selectedClinic) { clinic in
+                ClinicDetailView(clinic: clinic)
             }
         }
     }

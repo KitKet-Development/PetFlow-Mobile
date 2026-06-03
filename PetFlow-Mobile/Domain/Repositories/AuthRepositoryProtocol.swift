@@ -8,8 +8,7 @@
 import Foundation
 
 protocol AuthRepositoryProtocol {
-    
     func signup(request: SignUpRequestDTO) async throws
-    
+    func signupOwner(request: SignUpOwnerClinicRequestDTO) async throws
     func login(request: LoginRequestDTO) async throws
 }

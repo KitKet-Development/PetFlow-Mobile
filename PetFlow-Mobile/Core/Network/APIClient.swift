@@ -72,13 +72,46 @@ final class APIClient: APIClientProtocol {
             
             return try decoder.decode(T.self, from: data)
             
+        } catch let DecodingError.typeMismatch(type, context) {
+            
+            print("TYPE MISMATCH")
+            print(type)
+            print(context.codingPath)
+            print(context.debugDescription)
+            
+            throw DecodingError.typeMismatch(type, context)
+            
+        } catch let DecodingError.valueNotFound(type, context) {
+            
+            print("VALUE NOT FOUND")
+            print(type)
+            print(context.codingPath)
+            print(context.debugDescription)
+            
+            throw DecodingError.valueNotFound(type, context)
+            
+        } catch let DecodingError.keyNotFound(key, context) {
+            
+            print("KEY NOT FOUND")
+            print(key)
+            print(context.codingPath)
+            print(context.debugDescription)
+            
+            throw DecodingError.keyNotFound(key, context)
+            
+        } catch let DecodingError.dataCorrupted(context) {
+            
+            print("DATA CORRUPTED")
+            print(context.codingPath)
+            print(context.debugDescription)
+            
+            throw DecodingError.dataCorrupted(context)
+            
         } catch {
             
             print(error)
             
-            print(String(data: data, encoding: .utf8) ?? "")
-            
-            throw APIError.decodingError
+            throw error
         }
     }
     
@@ -127,18 +160,14 @@ final class APIClient: APIClientProtocol {
         }
         
         if let imageData {
-            
+            print("📸 Добавляем фото в multipart: \(imageData.count) bytes")
             body.append("--\(boundary)\r\n")
-            
-            body.append(
-                "Content-Disposition: form-data; name=\"\(imageFieldName)\"; filename=\"avatar.jpg\"\r\n"
-            )
-            
+            body.append("Content-Disposition: form-data; name=\"\(imageFieldName)\"; filename=\"avatar.jpg\"\r\n")
             body.append("Content-Type: image/jpeg\r\n\r\n")
-            
             body.append(imageData)
-            
             body.append("\r\n")
+        } else {
+            print("❌ imageData nil — фото не добавлено в запрос")
         }
         
         body.append("--\(boundary)--\r\n")
@@ -146,6 +175,9 @@ final class APIClient: APIClientProtocol {
         request.httpBody = body
         
         let (data, response) = try await URLSession.shared.data(for: request)
+        
+        print("📡 Статус ответа: \((response as? HTTPURLResponse)?.statusCode ?? 0)")
+        print("📡 Ответ сервера: \(String(data: data, encoding: .utf8) ?? "пусто")")
         
         guard let response = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
@@ -168,6 +200,38 @@ final class APIClient: APIClientProtocol {
         }
         
         return try decoder.decode(T.self, from: data)
+    }
+    
+    func requestNoContent(
+        endpoint: String,
+        method: String = "DELETE",
+        requiresAuth: Bool = false
+    ) async throws {
+        
+        guard let url = URL(string: endpoint) else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        if requiresAuth, let token = TokenStorage.shared.accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
+        let (_, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        
+        switch httpResponse.statusCode {
+        case 200...299: break
+        case 401: throw APIError.unauthorized
+        case 403: throw APIError.forbidden
+        default: throw APIError.serverError("Ошибка сервера: \(httpResponse.statusCode)")
+        }
     }
 }
 

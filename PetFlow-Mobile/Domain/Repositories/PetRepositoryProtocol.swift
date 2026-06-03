@@ -10,6 +10,5 @@ import Foundation
 protocol PetRepositoryProtocol {
     
     func getPets() async throws -> [PetDTO]
-    
     func createPet(request: CreatePetRequestDTO) async throws
 }

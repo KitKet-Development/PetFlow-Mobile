@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SpeciesDTO: Codable, Identifiable {
+struct SpeciesDTO: Codable, Identifiable, Hashable, Equatable {
     let id: Int
     let name: String
 }

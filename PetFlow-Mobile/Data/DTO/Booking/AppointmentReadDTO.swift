@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct AppointmentReadDTO: Codable, Identifiable {
+struct AppointmentReadDTO: Codable, Identifiable, Hashable {
+
     let id: Int
     let pet: AppointmentPetDTO
     let date: String

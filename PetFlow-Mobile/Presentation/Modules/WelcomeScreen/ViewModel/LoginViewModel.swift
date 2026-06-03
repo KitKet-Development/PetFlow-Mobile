@@ -27,20 +27,10 @@ final class LoginViewModel: ObservableObject {
     }
     
     private func performLogin() async {
-        
         do {
             isLoading = true
             
             try await loginUseCase.execute(
-                email: email,
-                password: password
-            )
-            
-            AppSession.shared.isAuthorized = true
-            
-            LocalStorageService.shared.currentUser = LocalUser(
-                firstName: "",
-                lastName: "",
                 email: email,
                 password: password
             )

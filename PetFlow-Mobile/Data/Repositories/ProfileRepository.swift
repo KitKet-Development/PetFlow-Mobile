@@ -7,16 +7,6 @@
 
 import Foundation
 
-protocol ProfileRepositoryProtocol {
-    
-    func getProfile(userID: Int) async throws -> UserDTO
-    
-    func updateProfile(
-        userID: Int,
-        dto: UpdateUserDTO
-    ) async throws
-}
-
 final class ProfileRepository: ProfileRepositoryProtocol {
     
     private let apiClient: APIClientProtocol
@@ -25,32 +15,28 @@ final class ProfileRepository: ProfileRepositoryProtocol {
         self.apiClient = apiClient
     }
     
-    func getProfile(userID: Int) async throws -> UserDTO {
-        
+    func getProfile() async throws -> UserDTO {
         try await apiClient.request(
-            endpoint: APIConfig.shared.profileURL(
-                userID: userID
-            ),
+            endpoint: APIConfig.shared.meURL,
             method: "GET",
             body: nil,
             requiresAuth: true
         )
     }
     
-    func updateProfile(
-        userID: Int,
-        dto: UpdateUserDTO
-    ) async throws {
-        
-        let fields = [
+    func updateProfile(dto: UpdateUserDTO) async throws {
+        var fields: [String: String] = [
             "first_name": dto.first_name,
             "last_name": dto.last_name,
-            "email": dto.email,
-            "phone": dto.phone ?? ""
+            "email": dto.email
         ]
         
+        if let phone = dto.phone, !phone.isEmpty {
+            fields["phone"] = phone
+        }
+        
         let _: UserDTO = try await apiClient.uploadMultipart(
-            endpoint: APIConfig.shared.profileURL(userID: userID),
+            endpoint: APIConfig.shared.meURL,
             method: "PATCH",
             fields: fields,
             imageData: dto.avatar,

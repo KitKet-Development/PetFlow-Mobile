@@ -7,9 +7,13 @@
 
 final class DependencyContainer {
     
-    static let shared = DependencyContainer()
+    static var shared = DependencyContainer()
     
     private init() {}
+    
+    static func reset() {
+        shared = DependencyContainer()
+    }
     
     lazy var bookingRepository: BookingRepositoryProtocol = {
         BookingRepository(apiClient: apiClient)
@@ -95,5 +99,25 @@ final class DependencyContainer {
     
     lazy var getSlotsUseCase: GetSlotsUseCase = {
         GetSlotsUseCase(repository: clinicRepository)
+    }()
+    
+    lazy var getVetsUseCase: GetVetsUseCase = {
+        GetVetsUseCase(repository: clinicRepository)
+    }()
+    
+    lazy var medicalCardRepository: MedicalCardRepositoryProtocol = {
+        MedicalCardRepository()
+    }()
+    
+    lazy var getMedicalCardUseCase: GetMedicalCardUseCase = {
+        GetMedicalCardUseCase(repository: medicalCardRepository)
+    }()
+    
+    lazy var downloadVisitAttachmentUseCase: DownloadVisitAttachmentUseCase = {
+        DownloadVisitAttachmentUseCase(repository: medicalCardRepository)
+    }()
+    
+    lazy var ownerRepository: OwnerRepositoryProtocol = {
+        OwnerRepository(client: apiClient)
     }()
 }

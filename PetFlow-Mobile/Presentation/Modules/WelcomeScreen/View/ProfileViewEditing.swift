@@ -35,53 +35,39 @@ struct ProfileViewEditing: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     ZStack {
-                        
-                        if let avatarImage = viewModel.avatarImage {
-                            
-                            Image(uiImage: avatarImage)
+                        if let uiImage = viewModel.avatarImage {
+                            Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
-                            
                         } else if let avatarURL = viewModel.avatarURL,
                                   let url = URL(string: avatarURL) {
-                            
-                            AsyncImage(url: url) { image in
-                                
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                
-                            } placeholder: {
-                                
-                                ProgressView()
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image.resizable().scaledToFill()
+                                default:
+                                    Image(ProfileViewImages.userPhoto)
+                                        .resizable()
+                                        .scaledToFill()
+                                }
                             }
-                            
                         } else {
-                            
                             Image(ProfileViewImages.userPhoto)
                                 .resizable()
                                 .scaledToFill()
                         }
                         
-                        PhotosPicker(
-                            selection: $selectedItem,
-                            matching: .images
-                        ) {
-                            
+                        PhotosPicker(selection: $selectedItem, matching: .images) {
                             Circle()
                                 .fill(Color(hex: "#4A37A7"))
                                 .frame(width: 42, height: 42)
                                 .overlay {
-                                    
                                     Image(systemName: AddPetViewImages.cameraIcon)
                                         .foregroundColor(.white)
                                 }
                         }
                         .offset(x: 40, y: 40)
                     }
-                    .frame(width: 120, height: 120)
-                    .clipShape(Circle())
-                    .padding(.top, 20)
                     .frame(width: 120, height: 120)
                     .clipShape(Circle())
                     .padding(.top, 20)
@@ -122,12 +108,21 @@ struct ProfileViewEditing: View {
         }
         .navigationBarHidden(true)
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
-        .onChange(of: selectedItem) { newValue, _ in
-            Task {
-                if let data = try? await newValue?.loadTransferable(type: Data.self),
+        .task(id: selectedItem) {
+            guard let item = selectedItem else { return }
+            
+            do {
+                if let data = try await item.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
-                    viewModel.avatarImage = uiImage
+                    print("✅ Фото загружено: \(data.count) bytes")
+                    await MainActor.run {
+                        viewModel.avatarImage = uiImage
+                    }
+                } else {
+                    print("❌ Не удалось создать UIImage из data")
                 }
+            } catch {
+                print("❌ loadTransferable error: \(error)")
             }
         }
         .onAppear {
@@ -138,6 +133,17 @@ struct ProfileViewEditing: View {
                     await viewModel.loadProfile()
                 }
             }
+        }
+    }
+}
+
+
+struct PhotosPickerImage: Transferable {
+    let image: UIImage?
+    
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(importedContentType: .image) { data in
+            PhotosPickerImage(image: UIImage(data: data))
         }
     }
 }

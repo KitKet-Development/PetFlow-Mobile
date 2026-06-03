@@ -34,4 +34,16 @@ final class APIConfig {
     var petsURL: String {
         "\(baseURL)/pets/"
     }
+    
+    var meURL: String {
+        "\(baseURL)/users/me/"
+    }
+    
+    func medicalCardURL(petId: Int) -> String {
+        "\(baseURL)/pets/\(petId)/medical-card/"
+    }
+    
+    func downloadAttachmentURL(petId: Int, visitId: Int) -> String {
+        "\(baseURL)/pets/\(petId)/visits/\(visitId)/download-attachment/"
+    }
 }

@@ -5,7 +5,7 @@
 //  Created by Stepan Kolenkin on 25.05.2026.
 //
 
-struct AppointmentSlotDTO: Codable {
+struct AppointmentSlotDTO: Codable, Hashable {
     let start_time: String
     let end_time: String
 }

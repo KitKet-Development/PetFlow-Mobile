@@ -10,7 +10,6 @@ import PhotosUI
 
 struct AddPetView: View {
     @StateObject private var viewModel = AddPetViewModel()
-    @StateObject private var storage = LocalStorageService.shared
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var petImage: Image? = nil
     @State private var petUIImage: UIImage? = nil
@@ -93,7 +92,6 @@ struct AddPetView: View {
                             text: $viewModel.petName
                         )
                         
-                        // ← один DropdownField с onChange
                         DropdownField(
                             label: AddPetViewStrings.petTypeLabel,
                             placeholder: AddPetViewStrings.petTypePlaceholder,

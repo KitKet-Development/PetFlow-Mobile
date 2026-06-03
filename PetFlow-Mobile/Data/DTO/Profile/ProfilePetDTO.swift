@@ -6,10 +6,9 @@
 //
 
 struct ProfilePetDTO: Codable, Identifiable {
-    
     let id: Int
     let name: String
     let species: Int?
-    let breed: BreedDTO?
-    let photo: String?
+    let breed: BreedReadSimpleDTO?
+    let avatar: String?
 }

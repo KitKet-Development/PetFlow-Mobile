@@ -21,7 +21,7 @@ struct MainTabView: View {
                 case .catalog:
                     ClinicCatalogView()
                 case .pets:
-                    PetDetailView()
+                    PetsTabView()
                 case .bookings:
                     UserAppointmentsView()
                 case .profile:

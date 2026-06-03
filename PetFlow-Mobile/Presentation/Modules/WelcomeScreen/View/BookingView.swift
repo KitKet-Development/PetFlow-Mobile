@@ -32,7 +32,6 @@ struct BookingView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 24) {
                     
-                    // Блок дат — без изменений
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text(BookingViewString.selectDateTitle)
@@ -55,7 +54,6 @@ struct BookingView: View {
                         }
                     }
                     
-                    // Блок слотов — реальные данные
                     if viewModel.slots.isEmpty {
                         Text("Нет доступных слотов")
                             .font(.system(size: 14))
@@ -81,7 +79,6 @@ struct BookingView: View {
                         }
                     }
                     
-                    // Блок питомцев — без изменений
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text(BookingViewString.selectPetTitle)
@@ -182,7 +179,7 @@ struct BookingView: View {
         }
         .background(Color(hex: "#F8F9FE").ignoresSafeArea())
         .task {
-            await viewModel.loadData(clinicId: clinic.id) // один вызов вместо трёх
+            await viewModel.loadData(clinicId: clinic.id)
         }
     }
 }

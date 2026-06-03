@@ -71,13 +71,6 @@ final class AddPetViewModel: ObservableObject {
                 image: image
             )
             
-            let localPet = LocalPet(
-                name: petName,
-                type: petType,
-                image: image
-            )
-            LocalStorageService.shared.pets.append(localPet)
-            
             success = true
             
         } catch {

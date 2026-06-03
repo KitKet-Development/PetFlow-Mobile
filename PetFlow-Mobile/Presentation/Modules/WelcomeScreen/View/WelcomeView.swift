@@ -84,6 +84,7 @@ struct WelcomeView: View {
                         .padding(.bottom, geometry.size.height * 0.03)
                     }
                 }
+                .toolbar(.hidden, for: .navigationBar)
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .navigationDestination(isPresented: $showRegistration) {
                     RegistrationView()

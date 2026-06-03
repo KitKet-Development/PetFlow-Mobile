@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RegistrationView: View {
     @StateObject private var viewModel = RegistrationViewModel()
-    @StateObject private var storage = LocalStorageService.shared
     @Environment(\.dismiss) var dismiss
     
     @State private var navigateToAddPet = false

@@ -33,7 +33,7 @@ final class BookingViewModel: ObservableObject {
     @Published var comment = ""
     
     @Published var pets: [BookingPetUIModel] = []
-    @Published var slots: [SlotDTO] = []       // ← вместо timeSlots
+    @Published var slots: [SlotDTO] = []
     @Published var appointments: [AppointmentCardUIModel] = []
     
     @Published var isLoading = false
@@ -97,9 +97,9 @@ final class BookingViewModel: ObservableObject {
                 BookingPetUIModel(
                     id: $0.id,
                     name: $0.name,
-                    species: $0.species.name,   // ← объект
+                    species: $0.species.name,
                     breed: $0.breed?.name ?? "",
-                    imageURL: $0.avatar         // ← было photo
+                    imageURL: $0.avatar
                 )
             }
             
@@ -178,7 +178,7 @@ final class BookingViewModel: ObservableObject {
             let dto = AppointmentWriteDTO(
                 pet: selectedPetId,
                 date: selectedDate,
-                slot: selectedSlotId, // ← теперь реальный id слота
+                slot: selectedSlotId,
                 comment: comment.isEmpty ? nil : comment
             )
             

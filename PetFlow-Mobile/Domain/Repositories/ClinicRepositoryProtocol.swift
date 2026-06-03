@@ -10,4 +10,5 @@ import Foundation
 protocol ClinicRepositoryProtocol {
     func getClinics(filters: ClinicFilterParams) async throws -> [ClinicDTO]
     func getSlots(clinicId: Int) async throws -> [SlotDTO]
+    func getVets(clinicId: Int) async throws -> [VetProfileReadDTO]
 }
